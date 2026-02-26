@@ -6,57 +6,59 @@ import { Input } from '../components/ui/input';
 import { useData } from '../contexts/DataContext';
 import Header from '../sections/public/Header';
 import Footer from '../sections/public/Footer';
+import { getOptimizedImageUrl } from '../lib/image';
 import type { Project } from '../types';
 
 // Project Card Component
 function ProjectCard({ project, viewMode }: { project: Project; viewMode: 'grid' | 'list' }) {
+  const badgeClasses = `px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md border shadow-sm backdrop-blur-md`;
+
   if (viewMode === 'list') {
     return (
       <Link
         to={`/projects/${project.id}`}
-        className="flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 rounded-2xl bg-[#1a1a1a] border border-white/10 hover:border-[#c4ff00]/50 transition-all group"
+        className="flex flex-col sm:flex-row gap-4 sm:gap-6 p-4 rounded-3xl bg-white border border-amber-100 shadow-sm hover:shadow-xl hover:shadow-orange-500/5 hover:border-orange-200 transition-all duration-300 group"
       >
-        {/* Image */}
-        <div className="w-full sm:w-48 h-48 sm:h-32 rounded-xl overflow-hidden flex-shrink-0">
+        {/* Smaller Image for List View */}
+        <div className="w-full sm:w-56 h-48 sm:h-40 rounded-2xl overflow-hidden flex-shrink-0">
           <img
-            src={project.images[0] || '/placeholder-project.jpg'}
+            src={getOptimizedImageUrl(project.images[0], { width: 800, quality: 85 })}
             alt={project.title}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             loading="lazy"
           />
         </div>
 
         {/* Content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap gap-2 mb-2">
+        <div className="flex-1 min-w-0 py-2 flex flex-col justify-center">
+          <div className="flex flex-wrap gap-2 mb-3">
             {project.tags.slice(0, 3).map((tag) => (
-              <span
-                key={tag}
-                className="px-2 py-0.5 text-xs rounded-full bg-[#c4ff00]/20 text-[#c4ff00] border border-[#c4ff00]/30"
-              >
+              <span key={tag} className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-orange-50 text-orange-600 border border-orange-100">
                 {tag}
               </span>
             ))}
           </div>
-          <h3 className="text-lg font-bold text-white mb-1 group-hover:text-[#c4ff00] transition-colors">
+          <h3 className="text-xl font-extrabold text-slate-800 mb-2 group-hover:text-orange-600 transition-colors">
             {project.title}
           </h3>
-          <p className="text-gray-400 text-sm line-clamp-2 mb-2">{project.description}</p>
-          <div className="flex items-center gap-4 text-sm text-gray-500">
-            <span className="flex items-center gap-1">
-              <MapPin className="w-4 h-4" />
+          <p className="text-slate-500 text-sm font-medium line-clamp-2 mb-4 leading-relaxed">{project.description}</p>
+          <div className="flex items-center gap-6 text-sm font-bold text-slate-400">
+            <span className="flex items-center gap-1.5">
+              <MapPin className="w-4 h-4 text-orange-500" />
               {project.city}, {project.state}
             </span>
-            <span className="flex items-center gap-1">
-              <Zap className="w-4 h-4" />
+            <span className="flex items-center gap-1.5">
+              <Zap className="w-4 h-4 text-amber-500" />
               {project.capacity_kw} kW
             </span>
           </div>
         </div>
 
-        {/* Arrow */}
-        <div className="hidden sm:flex items-center">
-          <ArrowRight className="w-5 h-5 text-gray-500 group-hover:text-[#c4ff00] group-hover:translate-x-1 transition-all" />
+        {/* Action Button */}
+        <div className="hidden sm:flex items-center pr-4">
+          <div className="w-10 h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:bg-orange-500 group-hover:border-orange-500 transition-all duration-300">
+            <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+          </div>
         </div>
       </Link>
     );
@@ -65,62 +67,55 @@ function ProjectCard({ project, viewMode }: { project: Project; viewMode: 'grid'
   return (
     <Link
       to={`/projects/${project.id}`}
-      className="group block rounded-2xl overflow-hidden bg-[#1a1a1a] border border-white/10 hover:border-[#c4ff00]/50 transition-all"
+      className="group block rounded-[2rem] overflow-hidden bg-white border border-amber-100 shadow-sm hover:shadow-2xl hover:shadow-orange-500/10 hover:border-orange-200 transition-all duration-500 hover:-translate-y-1.5"
     >
-      {/* Image */}
-      <div className="relative h-48 overflow-hidden">
+      {/* Smaller, Framed Image Top */}
+      <div className="relative h-56 overflow-hidden">
         <img
-          src={project.images[0] || '/placeholder-project.jpg'}
+          src={getOptimizedImageUrl(project.images[0], { width: 1000, quality: 85 })}
           alt={project.title}
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
           loading="lazy"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         
         {/* Status Badge */}
-        <div className="absolute top-3 right-3">
-          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+        <div className="absolute top-4 right-4">
+          <span className={`${badgeClasses} ${
             project.status === 'active'
-              ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+              ? 'bg-emerald-100/90 text-emerald-700 border-emerald-200'
               : project.status === 'completed'
-              ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
-              : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+              ? 'bg-blue-100/90 text-blue-700 border-blue-200'
+              : 'bg-amber-100/90 text-amber-700 border-amber-200'
           }`}>
             {project.status}
           </span>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-5">
-        {/* Tags */}
+      {/* Content Bottom */}
+      <div className="p-6">
         <div className="flex flex-wrap gap-2 mb-3">
           {project.tags.slice(0, 2).map((tag) => (
-            <span
-              key={tag}
-              className="px-2 py-0.5 text-xs rounded-full bg-[#c4ff00]/20 text-[#c4ff00] border border-[#c4ff00]/30"
-            >
+            <span key={tag} className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-md bg-slate-50 text-slate-600 border border-slate-200">
               {tag}
             </span>
           ))}
         </div>
 
-        {/* Title */}
-        <h3 className="text-lg font-bold text-white mb-2 group-hover:text-[#c4ff00] transition-colors line-clamp-2">
+        <h3 className="text-xl font-extrabold text-slate-800 mb-2 group-hover:text-orange-600 transition-colors line-clamp-1">
           {project.title}
         </h3>
 
-        {/* Description */}
-        <p className="text-gray-400 text-sm line-clamp-2 mb-4">{project.description}</p>
+        <p className="text-slate-500 text-sm font-medium line-clamp-2 mb-6 leading-relaxed">{project.description}</p>
 
-        {/* Meta */}
-        <div className="flex items-center justify-between text-sm text-gray-500">
-          <span className="flex items-center gap-1">
-            <MapPin className="w-4 h-4" />
+        <div className="flex items-center justify-between text-sm font-bold pt-4 border-t border-slate-50">
+          <span className="flex items-center gap-1.5 text-slate-500">
+            <MapPin className="w-4 h-4 text-orange-500" />
             {project.city}
           </span>
-          <span className="flex items-center gap-1">
-            <Zap className="w-4 h-4" />
+          <span className="flex items-center gap-1.5 text-orange-600">
+            <Zap className="w-4 h-4 text-amber-500" />
             {project.capacity_kw} kW
           </span>
         </div>
@@ -140,14 +135,12 @@ export default function ProjectsPage() {
   const [minCapacity, setMinCapacity] = useState<string>('');
   const [maxCapacity, setMaxCapacity] = useState<string>('');
 
-  // Get unique cities
   const cities = [...new Set(projects.map((p) => p.city))].sort();
 
   useEffect(() => {
     fetchProjects();
   }, [fetchProjects]);
 
-  // Apply filters from URL on mount
   useEffect(() => {
     const search = searchParams.get('search');
     const city = searchParams.get('city');
@@ -155,7 +148,6 @@ export default function ProjectsPage() {
     if (city) setSelectedCity(city);
   }, [searchParams]);
 
-  // Filter projects
   const filteredProjects = projects.filter((project) => {
     const matchesSearch =
       !searchQuery ||
@@ -193,98 +185,94 @@ export default function ProjectsPage() {
   const hasActiveFilters = searchQuery || selectedCity || selectedStatus || minCapacity || maxCapacity;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-white text-slate-800 selection:bg-amber-200">
       <Header />
 
-      <main className="pt-24 pb-16">
+      <main className="pt-32 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Our Projects</h1>
-            <p className="text-gray-400">
-              Explore our portfolio of solar installations across India
+          <div className="mb-12">
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">
+              Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">Solar Portfolio</span>
+            </h1>
+            <p className="text-lg text-slate-600 font-medium max-w-2xl leading-relaxed">
+              Explore our diverse installations across India, ranging from residential rooftops to massive industrial solar farms.
             </p>
           </div>
 
-          {/* Search & Filters Bar */}
-          <div className="mb-8 space-y-4">
-            <div className="flex flex-col sm:flex-row gap-4">
-              {/* Search */}
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          {/* Action Bar */}
+          <div className="mb-10 space-y-4">
+            <div className="flex flex-col lg:flex-row gap-4">
+              <div className="flex-1 relative group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-orange-500 transition-colors" />
                 <Input
                   type="text"
-                  placeholder="Search projects..."
+                  placeholder="Search projects by name, city, or kW..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && applyFilters()}
-                  className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+                  className="pl-12 py-7 bg-white border-amber-100 text-slate-800 placeholder:text-slate-400 focus:border-orange-400 focus:ring-orange-400/10 shadow-sm rounded-2xl font-medium"
                 />
               </div>
 
-              {/* Filter Toggle */}
-              <Button
-                variant="outline"
-                onClick={() => setShowFilters(!showFilters)}
-                className={`border-white/30 ${showFilters ? 'bg-white/10' : ''}`}
-              >
-                <Filter className="w-4 h-4 mr-2" />
-                Filters
-                {hasActiveFilters && (
-                  <span className="ml-2 w-5 h-5 rounded-full bg-[#c4ff00] text-black text-xs flex items-center justify-center">
-                    {[selectedCity, selectedStatus, minCapacity, maxCapacity].filter(Boolean).length +
-                      (searchQuery ? 1 : 0)}
-                  </span>
-                )}
-              </Button>
+              <div className="flex gap-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`py-7 px-6 rounded-2xl border-amber-100 font-bold ${showFilters ? 'bg-orange-50 border-orange-200 text-orange-600' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+                >
+                  <Filter className="w-5 h-5 mr-2" />
+                  Filters
+                  {hasActiveFilters && (
+                    <span className="ml-3 w-6 h-6 rounded-full bg-orange-500 text-white text-[10px] flex items-center justify-center shadow-md">
+                      {[selectedCity, selectedStatus, minCapacity, maxCapacity].filter(Boolean).length + (searchQuery ? 1 : 0)}
+                    </span>
+                  )}
+                </Button>
 
-              {/* View Mode Toggle */}
-              <div className="flex rounded-lg border border-white/10 overflow-hidden">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 ${viewMode === 'grid' ? 'bg-[#c4ff00] text-black' : 'text-gray-400 hover:text-white'}`}
-                  aria-label="Grid view"
-                >
-                  <Grid3X3 className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 ${viewMode === 'list' ? 'bg-[#c4ff00] text-black' : 'text-gray-400 hover:text-white'}`}
-                  aria-label="List view"
-                >
-                  <List className="w-5 h-5" />
-                </button>
+                <div className="flex p-1 bg-white border border-amber-100 rounded-2xl shadow-sm h-14 my-auto">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`p-2 w-12 rounded-xl flex items-center justify-center transition-all ${viewMode === 'grid' ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' : 'text-slate-400 hover:text-orange-500'}`}
+                    aria-label="Grid view"
+                  >
+                    <Grid3X3 className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 w-12 rounded-xl flex items-center justify-center transition-all ${viewMode === 'list' ? 'bg-orange-500 text-white shadow-md shadow-orange-500/20' : 'text-slate-400 hover:text-orange-500'}`}
+                    aria-label="List view"
+                  >
+                    <List className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Expanded Filters */}
+            {/* Filter Panel */}
             {showFilters && (
-              <div className="p-4 rounded-xl bg-[#1a1a1a] border border-white/10 space-y-4">
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  {/* City Filter */}
+              <div className="p-8 rounded-3xl bg-white border border-amber-100 shadow-xl shadow-orange-900/5 animate-in fade-in slide-in-from-top-4 duration-300">
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
                   <div>
-                    <label className="block text-sm text-gray-400 mb-2">City</label>
+                    <label className="block text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-3">Location</label>
                     <select
                       value={selectedCity}
                       onChange={(e) => setSelectedCity(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#c4ff00] focus:outline-none"
+                      className="w-full h-12 px-4 rounded-xl bg-slate-50 border border-slate-100 text-slate-800 font-bold focus:border-orange-400 focus:outline-none transition-all"
                     >
                       <option value="">All Cities</option>
                       {cities.map((city) => (
-                        <option key={city} value={city}>
-                          {city}
-                        </option>
+                        <option key={city} value={city}>{city}</option>
                       ))}
                     </select>
                   </div>
 
-                  {/* Status Filter */}
                   <div>
-                    <label className="block text-sm text-gray-400 mb-2">Status</label>
+                    <label className="block text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-3">Project Status</label>
                     <select
                       value={selectedStatus}
                       onChange={(e) => setSelectedStatus(e.target.value)}
-                      className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:border-[#c4ff00] focus:outline-none"
+                      className="w-full h-12 px-4 rounded-xl bg-slate-50 border border-slate-100 text-slate-800 font-bold focus:border-orange-400 focus:outline-none transition-all"
                     >
                       <option value="">All Statuses</option>
                       <option value="active">Active</option>
@@ -293,77 +281,66 @@ export default function ProjectsPage() {
                     </select>
                   </div>
 
-                  {/* Min Capacity */}
                   <div>
-                    <label className="block text-sm text-gray-400 mb-2">Min Capacity (kW)</label>
+                    <label className="block text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-3">Min Capacity (kW)</label>
                     <Input
                       type="number"
                       placeholder="0"
                       value={minCapacity}
                       onChange={(e) => setMinCapacity(e.target.value)}
-                      className="bg-white/5 border-white/10 text-white"
+                      className="h-12 bg-slate-50 border-slate-100 text-slate-800 font-bold rounded-xl"
                     />
                   </div>
 
-                  {/* Max Capacity */}
                   <div>
-                    <label className="block text-sm text-gray-400 mb-2">Max Capacity (kW)</label>
+                    <label className="block text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-3">Max Capacity (kW)</label>
                     <Input
                       type="number"
                       placeholder="Any"
                       value={maxCapacity}
                       onChange={(e) => setMaxCapacity(e.target.value)}
-                      className="bg-white/5 border-white/10 text-white"
+                      className="h-12 bg-slate-50 border-slate-100 text-slate-800 font-bold rounded-xl"
                     />
                   </div>
                 </div>
 
-                {/* Filter Actions */}
-                <div className="flex gap-3">
-                  <Button onClick={applyFilters} className="bg-[#c4ff00] text-black hover:bg-[#d4ff33]">
+                <div className="flex gap-3 pt-6 border-t border-slate-50">
+                  <Button onClick={applyFilters} className="bg-orange-500 text-white hover:bg-orange-600 font-bold px-8 h-12 rounded-xl shadow-md shadow-orange-500/20 border-0">
                     Apply Filters
                   </Button>
-                  {hasActiveFilters && (
-                    <Button variant="outline" onClick={clearFilters} className="border-white/30">
-                      <X className="w-4 h-4 mr-2" />
-                      Clear
-                    </Button>
-                  )}
+                  <Button variant="ghost" onClick={clearFilters} className="text-slate-500 hover:text-red-500 font-bold px-6 h-12 rounded-xl">
+                    <X className="w-4 h-4 mr-2" />
+                    Reset All
+                  </Button>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Results Count */}
-          <div className="mb-6 flex items-center justify-between">
-            <p className="text-gray-400">
-              Showing <span className="text-white font-medium">{filteredProjects.length}</span> projects
+          {/* Results Summary */}
+          <div className="mb-8 flex items-center justify-between px-2">
+            <p className="text-slate-500 font-bold text-sm uppercase tracking-wider">
+              Showing <span className="text-orange-600">{filteredProjects.length}</span> verified projects
             </p>
           </div>
 
-          {/* Projects Grid/List */}
+          {/* Project List */}
           {filteredProjects.length > 0 ? (
-            <div
-              className={
-                viewMode === 'grid'
-                  ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
-                  : 'space-y-4'
-              }
-            >
+            <div className={viewMode === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8' : 'space-y-6'}>
               {filteredProjects.map((project) => (
                 <ProjectCard key={project.id} project={project} viewMode={viewMode} />
               ))}
             </div>
           ) : (
-            <div className="text-center py-16">
-              <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-4">
-                <Search className="w-8 h-8 text-gray-500" />
+            <div className="text-center py-24 bg-white rounded-[3rem] border border-amber-100 border-dashed">
+              <div className="w-24 h-24 rounded-full bg-orange-50 flex items-center justify-center mx-auto mb-6 shadow-inner">
+                <Search className="w-10 h-10 text-orange-400" />
               </div>
-              <h3 className="text-lg font-medium text-white mb-2">No projects found</h3>
-              <p className="text-gray-400 mb-4">Try adjusting your search or filters</p>
+              <h3 className="text-2xl font-extrabold text-slate-800 mb-2 tracking-tight">No projects matched</h3>
+              <p className="text-slate-500 font-medium mb-8">Try adjusting your filters or search terms</p>
               {hasActiveFilters && (
-                <Button variant="outline" onClick={clearFilters} className="border-white/30">
-                  Clear Filters
+                <Button onClick={clearFilters} className="bg-slate-900 text-white hover:bg-slate-800 font-bold rounded-full px-8 py-6 h-auto border-0">
+                  Clear All Filters
                 </Button>
               )}
             </div>

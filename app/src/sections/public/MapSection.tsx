@@ -1,152 +1,166 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Zap, Navigation } from 'lucide-react';
+import {  Zap } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
+// Double check the spelling: indiamap.png (one 'i')
+import indiaMapImg from './indiamap.png';
 
 export default function MapSection() {
-  const { projects, settings, fetchProjects, fetchSettings } = useData();
+  const { projects, fetchProjects } = useData();
+  const [activeCity, setActiveCity] = useState<string | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
 
   useEffect(() => {
     fetchProjects();
-    fetchSettings();
-  }, [fetchProjects, fetchSettings]);
+  }, [fetchProjects]);
 
   // Filter projects with valid coordinates
   const mapProjects = projects.filter(
     (p) => p.latitude && p.longitude && p.status === 'active'
   );
 
-  const mapCenterLat = settings?.map_center_lat || 21.0;
-  const mapCenterLng = settings?.map_center_lng || 78.0;
+  // Get unique cities for navigation
+  const cities = [...new Set(mapProjects.map((p) => p.city))].slice(0, 8);
 
-  // Build map URL with markers
-  const buildMapUrl = () => {
-    const baseUrl = 'https://www.openstreetmap.org/export/embed.html';
-    const bbox = getBoundingBox();
-    const markerParams = mapProjects
-      .map((p) => `mlat=${p.latitude}&mlon=${p.longitude}`)
-      .join('&');
-    return `${baseUrl}?bbox=${bbox}&layer=mapnik${markerParams ? '&' + markerParams : ''}`;
+  /**
+   * CALIBRATED COORDINATE PROJECTION for indiamap.png
+   * This handles the specific padding in your local image.
+   */
+  const getPinPosition = (lat: number, lng: number) => {
+    // Calibration for the local PNG file padding
+    const IMG_MIN_LAT = 5.0;   
+    const IMG_MAX_LAT = 38.5;  
+    const IMG_MIN_LNG = 65.0;  
+    const IMG_MAX_LNG = 98.5;  
+
+    let x = ((lng - IMG_MIN_LNG) / (IMG_MAX_LNG - IMG_MIN_LNG)) * 100;
+    let y = ((IMG_MAX_LAT - lat) / (IMG_MAX_LAT - IMG_MIN_LAT)) * 100;
+
+    // Manual fine-tune nudges
+    const X_OFFSET = 1.5; 
+    const Y_OFFSET = -0.5; 
+
+    return { left: `${x + X_OFFSET}%`, top: `${y + Y_OFFSET}%` };
   };
 
-  const getBoundingBox = () => {
-    if (mapProjects.length === 0) {
-      return `${mapCenterLng - 5}%2C${mapCenterLat + 5}%2C${mapCenterLng + 5}%2C${mapCenterLat - 5}`;
-    }
-    const lats = mapProjects.map((p) => p.latitude);
-    const lngs = mapProjects.map((p) => p.longitude);
-    const minLat = Math.min(...lats) - 2;
-    const maxLat = Math.max(...lats) + 2;
-    const minLng = Math.min(...lngs) - 2;
-    const maxLng = Math.max(...lngs) + 2;
-    return `${minLng}%2C${maxLat}%2C${maxLng}%2C${minLat}`;
-  };
-
-  if (mapProjects.length === 0) {
-    return null;
-  }
+  if (mapProjects.length === 0) return null;
 
   return (
-    <section className="py-16 sm:py-24 bg-[#0a0a0a]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
-        <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3">
-            Our Projects Across India
-          </h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">
-            From Mumbai to Delhi, Bangalore to Kolkata - explore our solar installations 
-            powering businesses and communities nationwide
-          </p>
-        </div>
+    <section className="relative py-20 sm:py-32 bg-white overflow-hidden font-sans">
+      {/* Background Decor */}
+      <div 
+        className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(to right, #000 1px, transparent 1px), linear-gradient(to bottom, #000 1px, transparent 1px)`,
+          backgroundSize: '40px 40px',
+        }}
+      />
 
-        {/* Map Container */}
-        <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-black/50">
-          {/* Map Stats Overlay */}
-          <div className="absolute top-4 left-4 z-10 bg-[#0a0a0a]/90 backdrop-blur-md rounded-xl p-4 border border-white/10">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#c4ff00]/20 flex items-center justify-center">
-                <Navigation className="w-5 h-5 text-[#c4ff00]" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-white">{mapProjects.length}</div>
-                <div className="text-xs text-gray-400">Active Projects</div>
-              </div>
-            </div>
-          </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          
+          {/* Left: Content */}
+          <div className="max-w-2xl">
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 mb-6 tracking-tight">
+              Our Projects <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">Across India</span>
+            </h2>
+            <p className="text-lg text-slate-600 font-medium mb-10 leading-relaxed">
+              Find our verified solar installations in {cities.length}+ cities. 
+              Click on a city to view specific projects.
+            </p>
 
-          {/* Embedded Map */}
-          <div className="h-[400px] sm:h-[500px] lg:h-[600px]">
-            <iframe
-              src={buildMapUrl()}
-              width="100%"
-              height="100%"
-              style={{ border: 0, filter: 'grayscale(100%) invert(92%)' }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Solar Projects Map"
-              onLoad={() => setIsMapLoaded(true)}
-            />
-          </div>
-
-          {/* Loading State */}
-          {!isMapLoaded && (
-            <div className="absolute inset-0 flex items-center justify-center bg-[#1a1a1a]">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#c4ff00]" />
-            </div>
-          )}
-        </div>
-
-        {/* City List */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
-          {[...new Set(mapProjects.map((p) => p.city))]
-            .slice(0, 10)
-            .map((city) => (
-              <Link
-                key={city}
-                to={`/projects?city=${encodeURIComponent(city)}`}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition-colors text-sm"
-              >
-                <MapPin className="w-3 h-3" />
-                {city}
+            <div className="flex flex-wrap gap-3 mb-12">
+              {cities.map((city) => (
+                <button
+                  key={city}
+                  onMouseEnter={() => setActiveCity(city)}
+                  onMouseLeave={() => setActiveCity(null)}
+                  className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 border ${
+                    activeCity === city
+                      ? 'bg-orange-500 text-white border-orange-500 shadow-lg shadow-orange-500/20'
+                      : 'bg-white text-slate-600 border-slate-200 hover:border-orange-300 hover:text-orange-600'
+                  }`}
+                >
+                  {city}
+                </button>
+              ))}
+              <Link to="/projects" className="px-5 py-2.5 rounded-full text-sm font-bold text-orange-600 bg-orange-50 hover:bg-orange-100 transition-colors">
+                View All →
               </Link>
-            ))}
-        </div>
+            </div>
 
-        {/* Project List Below Map */}
-        <div className="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mapProjects.slice(0, 6).map((project) => (
-            <Link
-              key={project.id}
-              to={`/projects/${project.id}`}
-              className="group flex items-center gap-4 p-4 rounded-xl bg-[#1a1a1a] border border-white/10 hover:border-[#c4ff00]/50 transition-all"
-            >
-              <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                <img
-                  src={project.images[0] || '/placeholder-project.jpg'}
-                  alt={project.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-medium text-white truncate group-hover:text-[#c4ff00] transition-colors">
-                  {project.title}
-                </h3>
-                <div className="flex items-center gap-3 text-sm text-gray-500">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />
-                    {project.city}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Zap className="w-3 h-3" />
-                    {project.capacity_kw} kW
-                  </span>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {mapProjects.slice(0, 4).map((project) => (
+                <Link
+                  key={project.id}
+                  to={`/projects/${project.id}`}
+                  className="group flex items-center gap-4 p-4 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-xl hover:border-orange-200 transition-all duration-300 hover:-translate-y-1"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                    <Zap className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-extrabold text-slate-800 truncate text-sm">{project.title}</h3>
+                    <p className="text-xs font-medium text-slate-500">{project.city} • {project.capacity_kw}kW</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: The Local India Map */}
+          <div className="relative flex items-center justify-center min-h-[500px]">
+            <div className="relative w-full max-w-[550px] aspect-[4/5]">
+              {/* IMAGE SOURCE UPDATED TO LOCAL IMPORT */}
+              <img 
+                src={indiaMapImg} 
+                alt="Map of India" 
+                onLoad={() => setIsMapLoaded(true)}
+                className={`w-full h-full object-contain transition-opacity duration-700 ${isMapLoaded ? 'opacity-100' : 'opacity-20'}`}
+              />
+
+              {/* Loader - Shows if image or data hasn't finished */}
+              {!isMapLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-10 h-10 border-4 border-orange-200 border-t-orange-500 rounded-full animate-spin" />
                 </div>
-              </div>
-            </Link>
-          ))}
+              )}
+
+              {/* Pins Layer - Only visible when map is loaded */}
+              {isMapLoaded && mapProjects.map((project) => {
+                const position = getPinPosition(project.latitude, project.longitude);
+                const isHovered = activeCity === project.city;
+
+                return (
+                  <div
+                    key={project.id}
+                    className="absolute z-10 transform -translate-x-1/2 -translate-y-1/2 group transition-all duration-500"
+                    style={position}
+                  >
+                    <Link to={`/projects/${project.id}`} className="relative block">
+                      <div className={`relative flex items-center justify-center transition-all duration-300 ${isHovered ? 'scale-125 z-50' : 'scale-100'}`}>
+                        {/* Pulse Ring */}
+                        <div className={`absolute inset-0 rounded-full animate-ping ${isHovered ? 'bg-orange-400 opacity-40' : 'bg-blue-400 opacity-20'}`} />
+                        
+                        {/* Pin Dot */}
+                        <div className="w-4 h-4 bg-white rounded-full shadow-lg flex items-center justify-center border border-slate-100 relative z-10">
+                          <div className={`w-2.5 h-2.5 rounded-full transition-colors duration-300 ${isHovered ? 'bg-orange-500' : 'bg-blue-600'}`} />
+                        </div>
+
+                        {/* Label Tooltip */}
+                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-1.5 bg-slate-900 text-white text-[10px] font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                          {project.title}
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-900" />
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
         </div>
       </div>
     </section>

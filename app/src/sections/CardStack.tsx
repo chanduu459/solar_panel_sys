@@ -73,22 +73,22 @@ const CardStack = () => {
         triggerRef.current.kill();
       }
     };
-  }, []);
+  }, [cards]);
 
   if (!cardStackConfig.sectionTitle && cards.length === 0) return null;
 
   return (
     <section
       ref={sectionRef}
-      className="relative w-full bg-kaleo-sand"
+      className="relative w-full bg-amber-50/30"
       style={{ minHeight: `${(cards.length + 1) * 100}vh` }}
     >
       {/* Section Header */}
-      <div className="absolute top-0 left-0 right-0 py-12 md:py-16 text-center z-10">
-        <h2 className="font-display text-headline text-kaleo-earth">
+      <div className="absolute top-0 left-0 right-0 py-16 md:py-24 text-center z-10 px-4">
+        <h2 className="font-extrabold text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight">
           {cardStackConfig.sectionTitle}
         </h2>
-        <p className="font-body text-sm text-kaleo-terracotta uppercase tracking-[0.2em] mt-4">
+        <p className="font-bold text-sm md:text-base text-orange-600 uppercase tracking-[0.2em] mt-4">
           {cardStackConfig.sectionSubtitle}
         </p>
       </div>
@@ -98,7 +98,7 @@ const CardStack = () => {
         ref={wrapperRef}
         className="relative w-full h-screen flex items-center justify-center overflow-hidden"
       >
-        <div className="relative w-full max-w-4xl mx-auto px-6 md:px-8 aspect-[4/3]">
+        <div className="relative w-full max-w-4xl mx-auto px-6 md:px-8 aspect-[4/3] sm:aspect-video lg:aspect-[21/9]">
           {cards.map((card, index) => (
             <div
               key={card.id}
@@ -109,31 +109,32 @@ const CardStack = () => {
                 zIndex: index,
               }}
             >
-              <div className="relative overflow-hidden rounded-3xl shadow-deep bg-kaleo-cream h-full">
+              <div className="relative overflow-hidden rounded-[2rem] shadow-2xl shadow-orange-900/10 border border-amber-100 bg-white h-full group">
+                
                 {/* Image */}
                 <div className="absolute inset-0 overflow-hidden">
                   <img
                     src={card.image}
                     alt={card.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  {/* Image Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-kaleo-charcoal/60 via-transparent to-transparent" />
+                  {/* Image Overlay - Updated for better contrast with white text */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
                 </div>
 
                 {/* Card Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-                  <h3 className="font-display text-2xl md:text-3xl text-kaleo-cream mb-2">
+                <div className="absolute bottom-0 left-0 right-0 p-8 md:p-10">
+                  <h3 className="font-extrabold text-3xl md:text-4xl text-white mb-3 tracking-tight drop-shadow-sm">
                     {card.title}
                   </h3>
-                  <p className="font-body text-sm text-kaleo-cream/70">
+                  <p className="font-medium text-base md:text-lg text-slate-200 max-w-2xl leading-relaxed">
                     {card.description}
                   </p>
                 </div>
 
-                {/* Card Number */}
-                <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-kaleo-cream/20 backdrop-blur-sm flex items-center justify-center">
-                  <span className="font-body text-xs text-kaleo-cream">
+                {/* Card Number Badge */}
+                <div className="absolute top-6 right-6 w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg">
+                  <span className="font-extrabold text-lg text-white">
                     {String(index + 1).padStart(2, '0')}
                   </span>
                 </div>

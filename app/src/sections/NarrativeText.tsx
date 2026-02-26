@@ -55,52 +55,24 @@ const NarrativeText = () => {
     triggers.push(starTrigger);
 
     // Line animations with stagger
-    const line1Trigger = ScrollTrigger.create({
-      trigger: line1,
-      start: 'top 80%',
-      once: true,
-      onEnter: () => {
-        gsap.to(line1, {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          ease: 'power3.out',
-        });
-      },
+    const lines = [line1, line2, line3];
+    lines.forEach((line, index) => {
+      const trigger = ScrollTrigger.create({
+        trigger: line,
+        start: 'top 80%',
+        once: true,
+        onEnter: () => {
+          gsap.to(line, {
+            opacity: 1,
+            y: 0,
+            duration: 1,
+            delay: index * 0.15,
+            ease: 'power3.out',
+          });
+        },
+      });
+      triggers.push(trigger);
     });
-    triggers.push(line1Trigger);
-
-    const line2Trigger = ScrollTrigger.create({
-      trigger: line2,
-      start: 'top 80%',
-      once: true,
-      onEnter: () => {
-        gsap.to(line2, {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          delay: 0.15,
-          ease: 'power3.out',
-        });
-      },
-    });
-    triggers.push(line2Trigger);
-
-    const line3Trigger = ScrollTrigger.create({
-      trigger: line3,
-      start: 'top 80%',
-      once: true,
-      onEnter: () => {
-        gsap.to(line3, {
-          opacity: 1,
-          y: 0,
-          duration: 1,
-          delay: 0.3,
-          ease: 'power3.out',
-        });
-      },
-    });
-    triggers.push(line3Trigger);
 
     return () => {
       triggers.forEach(trigger => trigger.kill());
@@ -112,23 +84,26 @@ const NarrativeText = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full py-32 md:py-48 lg:py-56 bg-kaleo-sand"
+      className="relative w-full py-32 md:py-48 lg:py-56 bg-white font-sans overflow-hidden"
     >
-      <div className="max-w-4xl mx-auto px-6 md:px-8 text-center">
+      {/* Background radial glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(251,191,36,0.05)_0%,transparent_70%)] pointer-events-none" />
+
+      <div className="relative z-10 max-w-4xl mx-auto px-6 md:px-8 text-center">
         {/* Spinning Star */}
         <div
           ref={starRef}
           className="flex justify-center mb-16"
           style={{ willChange: 'transform, opacity' }}
         >
-          <StarIcon className="w-6 h-6 md:w-8 md:h-8 text-kaleo-terracotta spin-slow" />
+          <StarIcon className="w-6 h-6 md:w-8 md:h-8 text-orange-500 animate-spin-slow" />
         </div>
 
         {/* Narrative Text */}
         <div className="space-y-8 md:space-y-10">
           <p
             ref={line1Ref}
-            className="font-display text-headline text-kaleo-earth"
+            className="font-extrabold text-4xl md:text-5xl lg:text-6xl text-slate-900 tracking-tight leading-tight"
             style={{ willChange: 'transform, opacity' }}
           >
             {narrativeTextConfig.line1}
@@ -136,7 +111,7 @@ const NarrativeText = () => {
 
           <p
             ref={line2Ref}
-            className="font-display text-subheadline text-kaleo-earth/80 italic max-w-2xl mx-auto"
+            className="text-2xl md:text-3xl text-slate-600 italic font-medium max-w-2xl mx-auto leading-relaxed"
             style={{ willChange: 'transform, opacity' }}
           >
             {narrativeTextConfig.line2}
@@ -144,16 +119,17 @@ const NarrativeText = () => {
 
           <p
             ref={line3Ref}
-            className="font-body text-sm md:text-base text-kaleo-earth/60 max-w-lg mx-auto leading-relaxed tracking-wide"
+            className="text-base md:text-lg text-slate-500 font-medium max-w-lg mx-auto leading-relaxed tracking-wide"
             style={{ willChange: 'transform, opacity' }}
           >
             {narrativeTextConfig.line3}
           </p>
         </div>
 
-        {/* Bottom Star */}
-        <div className="flex justify-center mt-16">
-          <StarIcon className="w-4 h-4 text-kaleo-terracotta/50" />
+        {/* Bottom Decorative Element */}
+        <div className="flex flex-col items-center justify-center mt-16 gap-4">
+          <div className="w-px h-12 bg-gradient-to-b from-orange-500/50 to-transparent" />
+          <StarIcon className="w-4 h-4 text-orange-400/40" />
         </div>
       </div>
     </section>

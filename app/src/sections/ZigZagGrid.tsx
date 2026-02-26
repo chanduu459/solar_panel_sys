@@ -54,7 +54,9 @@ const GridItem = ({
       end: 'bottom top',
       scrub: true,
       onUpdate: (self) => {
-        const yPercent = (self.progress - 0.5) * 20;
+        // Reduced from 20 to 12 for a smoother, subtler effect 
+        // that doesn't reveal the edges of the scaled image
+        const yPercent = (self.progress - 0.5) * 12;
         gsap.set(image, { yPercent });
       },
     });
@@ -79,15 +81,17 @@ const GridItem = ({
           item.reverse ? 'lg:order-2' : 'lg:order-1'
         }`}
       >
-        <div className="relative aspect-[4/3] overflow-hidden">
+        <div className="relative aspect-[16/10] overflow-hidden">
           <img
             ref={imageRef}
             src={item.image}
             alt={item.imageAlt}
-            className="w-full h-[120%] object-cover"
+            // Replaced h-[120%] with h-full to prevent native stretching
+            className="w-full h-full object-cover"
             style={{
               willChange: 'transform',
-              transform: 'scale(1.1)',
+              // Increased scale slightly to 1.15 to give the parallax enough room to move
+              transform: 'scale(1.15)',
             }}
           />
         </div>
@@ -98,18 +102,18 @@ const GridItem = ({
         ref={textRef}
         className={`${item.reverse ? 'lg:order-1 lg:pr-8' : 'lg:order-2 lg:pl-8'}`}
       >
-        <span className="font-body text-xs uppercase tracking-[0.2em] text-kaleo-terracotta">
+        <span className="font-body text-xs uppercase tracking-[0.2em] text-purple-300">
           {item.subtitle}
         </span>
-        <h3 className="font-display text-headline text-kaleo-earth mt-3">
+        <h3 className="font-display text-headline text-white mt-3">
           {item.title}
         </h3>
-        <p className="font-body text-sm md:text-base text-kaleo-earth/70 leading-relaxed mt-6">
+        <p className="font-body text-sm md:text-base text-white/70 leading-relaxed mt-6">
           {item.description}
         </p>
 
         {/* Decorative line */}
-        <div className="w-16 h-px bg-kaleo-terracotta/30 mt-8" />
+        <div className="w-16 h-px bg-purple-400/30 mt-8" />
       </div>
     </div>
   );
@@ -150,15 +154,15 @@ const ZigZagGrid = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full py-24 md:py-32 lg:py-40 bg-kaleo-sand"
+      className="relative w-full py-24 md:py-32 lg:py-40 bg-gradient-to-br from-purple-950 via-indigo-950 to-pink-950"
     >
       <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12">
         {/* Section Header */}
         <div ref={headerRef} className="text-center mb-20 md:mb-28">
-          <span className="font-body text-xs uppercase tracking-[0.2em] text-kaleo-terracotta">
+          <span className="font-body text-xs uppercase tracking-[0.2em] text-purple-300">
             {zigZagGridConfig.sectionLabel}
           </span>
-          <h2 className="font-display text-headline text-kaleo-earth mt-4">
+          <h2 className="font-display text-headline text-white mt-4">
             {zigZagGridConfig.sectionTitle}
           </h2>
         </div>

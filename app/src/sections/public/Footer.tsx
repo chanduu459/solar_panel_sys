@@ -34,7 +34,7 @@ export default function Footer() {
   const { settings } = useData();
 
   return (
-    <footer className="bg-[#050505] border-t border-white/10">
+    <footer className="bg-[#080616] border-t border-white/10">
       <div className="border-b border-white/10 bg-gradient-to-r from-[#c4ff00]/10 via-transparent to-[#c4ff00]/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <p className="text-sm text-gray-200">Ready to reduce your energy costs with premium solar infrastructure?</p>

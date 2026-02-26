@@ -21,7 +21,7 @@ const BreathSection = () => {
     if (!section || !container || !text || !subtitle) return;
 
     // Initial state
-    gsap.set(container, { scale: 0.92, borderRadius: '60px' });
+    gsap.set(container, { scale: 0.92, borderRadius: '48px' });
     gsap.set(text, { opacity: 0, scale: 1.1 });
     gsap.set(subtitle, { opacity: 0, y: 20 });
 
@@ -34,10 +34,10 @@ const BreathSection = () => {
       onUpdate: (self) => {
         const progress = self.progress;
 
-        // Container scale and border radius
+        // Container scale and border radius (smoothly transitions to a slightly sharper border)
         gsap.set(container, {
           scale: 0.92 + progress * 0.08,
-          borderRadius: `${60 - progress * 20}px`,
+          borderRadius: `${48 - progress * 24}px`, // transitions from 48px to 24px
         });
 
         // Text reveal
@@ -71,12 +71,12 @@ const BreathSection = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full py-16 md:py-24 bg-kaleo-sand"
+      className="relative w-full py-20 md:py-32 bg-white font-sans overflow-hidden"
     >
       <div className="px-4 md:px-8">
         <div
           ref={containerRef}
-          className="relative w-full max-w-7xl mx-auto overflow-hidden"
+          className="relative w-full max-w-7xl mx-auto overflow-hidden shadow-2xl shadow-orange-900/10 border border-amber-100"
           style={{ willChange: 'transform, border-radius' }}
         >
           {/* Background Image (simulating video) */}
@@ -87,43 +87,44 @@ const BreathSection = () => {
               className="w-full h-full object-cover"
             />
 
-            {/* Dark overlay for text contrast */}
-            <div className="absolute inset-0 bg-kaleo-charcoal/40" />
+            {/* Dark overlay for text contrast combined with a warm sunlit tint */}
+            <div className="absolute inset-0 bg-slate-900/40" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/20 to-orange-500/10 mix-blend-overlay" />
 
             {/* Content */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
               <h2
                 ref={textRef}
-                className="font-display text-display text-kaleo-cream tracking-tight"
+                className="font-extrabold text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight drop-shadow-xl"
                 style={{
                   willChange: 'transform, opacity',
-                  textShadow: '0 4px 30px rgba(0,0,0,0.3)'
                 }}
               >
                 {breathSectionConfig.title}
               </h2>
               <p
                 ref={subtitleRef}
-                className="font-body text-kaleo-cream/80 text-sm md:text-base uppercase tracking-[0.3em] mt-6"
+                className="font-bold text-amber-400 text-sm md:text-base lg:text-lg uppercase tracking-[0.25em] mt-6 drop-shadow-md"
                 style={{ willChange: 'transform, opacity' }}
               >
                 {breathSectionConfig.subtitle}
               </p>
             </div>
 
-            {/* Subtle gradient edges */}
-            <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-kaleo-charcoal/20 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-kaleo-charcoal/20 to-transparent" />
+            {/* Subtle gradient edges to blend shadows internally */}
+            <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-slate-900/30 to-transparent pointer-events-none" />
+            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-900/30 to-transparent pointer-events-none" />
           </div>
         </div>
       </div>
 
-      {/* Decorative elements */}
+      {/* Decorative Text Elements */}
       {breathSectionConfig.description && (
-        <div className="max-w-4xl mx-auto px-6 md:px-8 mt-16 md:mt-24 text-center">
-          <p className="font-body text-sm text-kaleo-earth/60 max-w-lg mx-auto leading-relaxed">
+        <div className="max-w-3xl mx-auto px-6 md:px-8 mt-16 md:mt-24 text-center">
+          <p className="text-lg md:text-xl font-medium text-slate-500 leading-relaxed">
             {breathSectionConfig.description}
           </p>
+          <div className="w-16 h-1 bg-gradient-to-r from-orange-400 to-amber-400 rounded-full mx-auto mt-8 opacity-50" />
         </div>
       )}
     </section>

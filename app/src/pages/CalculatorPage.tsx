@@ -31,51 +31,28 @@ export default function CalculatorPage() {
 
     if (inputValue <= 0) return;
 
-    // Calculate current monthly kWh usage
     const currentMonthlyKwh = useKwh
       ? inputValue
       : inputValue / settings.tariff_per_kwh;
 
-    // Calculate current monthly cost
     const currentMonthlyCost = useKwh
       ? inputValue * settings.tariff_per_kwh
       : inputValue;
 
-    // Recommended system size (kW) - covers 100% of usage
     const recommendedSystemSize = Math.ceil(
       currentMonthlyKwh / settings.kwh_per_kw_per_month
     );
 
-    // System cost
     const systemCost = recommendedSystemSize * settings.system_cost_per_kw;
-
-    // Subsidy amount
     const subsidyAmount = systemCost * (settings.subsidy_percentage / 100);
-
-    // Net cost after subsidy
     const netCost = systemCost - subsidyAmount;
-
-    // Monthly generation
     const monthlyGeneration = recommendedSystemSize * settings.kwh_per_kw_per_month;
-
-    // Monthly savings (what you would have paid for that electricity)
     const monthlySavings = monthlyGeneration * settings.tariff_per_kwh;
-
-    // Yearly savings
     const yearlySavings = monthlySavings * 12;
-
-    // Savings percentage
     const savingsPercentage = (monthlySavings / currentMonthlyCost) * 100;
-
-    // Payback period in years
     const paybackPeriod = netCost / yearlySavings;
-
-    // 25-year savings (typical solar panel lifespan)
-    const maintenanceCostTotal =
-      recommendedSystemSize * settings.maintenance_cost_per_kw_year * 25;
+    const maintenanceCostTotal = recommendedSystemSize * settings.maintenance_cost_per_kw_year * 25;
     const twentyFiveYearSavings = yearlySavings * 25 - netCost - maintenanceCostTotal;
-
-    // CO2 reduction (approx 0.85 kg per kWh in India)
     const co2Reduction = monthlyGeneration * 12 * 25 * 0.85; // kg over 25 years
 
     setResults({
@@ -108,246 +85,176 @@ export default function CalculatorPage() {
     }).format(value);
   };
 
+  const inputClasses = "pl-12 bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-orange-400 focus:ring-orange-400/20 shadow-sm rounded-xl py-6 text-lg font-medium";
+
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-white text-slate-800 selection:bg-amber-200">
       <Header />
 
-      <main className="pt-24 pb-16">
+      <main className="pt-32 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#c4ff00]/10 border border-[#c4ff00]/30 mb-6">
-              <Calculator className="w-4 h-4 text-[#c4ff00]" />
-              <span className="text-sm text-[#c4ff00] font-medium">Solar Savings Calculator</span>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-orange-100 border border-orange-200 mb-6 shadow-sm">
+              <Calculator className="w-4 h-4 text-orange-600" />
+              <span className="text-xs font-bold text-orange-700 uppercase tracking-wider">Savings Calculator</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-              Calculate Your Solar Savings
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight leading-tight">
+              Switch to Solar, <br className="hidden sm:block" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">Save Every Month</span>
             </h1>
-            <p className="text-gray-400 max-w-2xl mx-auto">
-              Discover how much you can save by switching to solar energy. 
-              Enter your current electricity usage to get a personalized estimate.
+            <p className="text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
+              Discover your potential savings in seconds. Enter your current energy usage and see the impact of clean solar power on your pocket and the planet.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
             {/* Input Section */}
-            <div className="bg-[#1a1a1a] rounded-3xl p-6 sm:p-8 border border-white/10">
-              <h2 className="text-xl font-bold text-white mb-6">Enter Your Details</h2>
+            <div className="bg-white rounded-[2.5rem] p-8 sm:p-10 border border-amber-100 shadow-xl shadow-orange-900/5">
+              <h2 className="text-2xl font-extrabold text-slate-800 mb-8">Tell us your usage</h2>
 
-              {/* Toggle */}
-              <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 mb-6">
+              {/* Toggle Switch */}
+              <div className="flex items-center justify-between p-5 rounded-2xl bg-slate-50 border border-slate-100 mb-8">
                 <div className="flex items-center gap-3">
-                  <IndianRupee className="w-5 h-5 text-[#c4ff00]" />
-                  <span className={`text-sm ${!useKwh ? 'text-white' : 'text-gray-500'}`}>
-                    Monthly Bill (₹)
-                  </span>
+                  <div className={`p-2 rounded-lg ${!useKwh ? 'bg-orange-100 text-orange-600' : 'bg-white text-slate-300'} transition-all`}>
+                    <IndianRupee className="w-5 h-5" />
+                  </div>
+                  <span className={`text-sm font-bold ${!useKwh ? 'text-slate-800' : 'text-slate-400'}`}>Monthly Bill</span>
                 </div>
-                <Switch
-                  checked={useKwh}
-                  onCheckedChange={setUseKwh}
-                />
+                
+                <Switch checked={useKwh} onCheckedChange={setUseKwh} />
+                
                 <div className="flex items-center gap-3">
-                  <span className={`text-sm ${useKwh ? 'text-white' : 'text-gray-500'}`}>
-                    Monthly Usage (kWh)
-                  </span>
-                  <Zap className="w-5 h-5 text-[#c4ff00]" />
+                  <span className={`text-sm font-bold ${useKwh ? 'text-slate-800' : 'text-slate-400'}`}>Monthly kWh</span>
+                  <div className={`p-2 rounded-lg ${useKwh ? 'bg-amber-100 text-amber-600' : 'bg-white text-slate-300'} transition-all`}>
+                    <Zap className="w-5 h-5" />
+                  </div>
                 </div>
               </div>
 
               {/* Input Field */}
-              <div className="space-y-4 mb-6">
-                <Label className="text-gray-300">
-                  {useKwh ? 'Monthly Electricity Usage' : 'Monthly Electricity Bill'}
+              <div className="space-y-3 mb-8">
+                <Label className="text-slate-700 font-bold ml-1">
+                  {useKwh ? 'Average Usage (kWh)' : 'Average Monthly Bill (₹)'}
                 </Label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">
+                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
                     {useKwh ? <Zap className="w-5 h-5" /> : <IndianRupee className="w-5 h-5" />}
                   </div>
                   <Input
                     type="number"
                     placeholder={useKwh ? 'e.g., 500' : 'e.g., 5000'}
                     value={useKwh ? monthlyKwh : monthlyBill}
-                    onChange={(e) =>
-                      useKwh
-                        ? setMonthlyKwh(e.target.value)
-                        : setMonthlyBill(e.target.value)
-                    }
-                    className="pl-12 bg-white/5 border-white/10 text-white placeholder:text-gray-500 text-lg py-6"
+                    onChange={(e) => useKwh ? setMonthlyKwh(e.target.value) : setMonthlyBill(e.target.value)}
+                    className={inputClasses}
                   />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
-                    {useKwh ? 'kWh' : '/month'}
+                  <div className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">
+                    {useKwh ? 'kWh' : '/ month'}
                   </div>
                 </div>
-                <p className="text-sm text-gray-500">
-                  {useKwh
-                    ? 'Enter your average monthly electricity consumption in kilowatt-hours'
-                    : 'Enter your average monthly electricity bill amount'}
-                </p>
               </div>
 
-              {/* Calculate Button */}
               <Button
                 onClick={calculateSavings}
-                disabled={
-                  useKwh
-                    ? !monthlyKwh || parseFloat(monthlyKwh) <= 0
-                    : !monthlyBill || parseFloat(monthlyBill) <= 0
-                }
-                className="w-full bg-[#c4ff00] text-black hover:bg-[#d4ff33] py-6 text-lg font-semibold"
+                disabled={useKwh ? !monthlyKwh || parseFloat(monthlyKwh) <= 0 : !monthlyBill || parseFloat(monthlyBill) <= 0}
+                className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 py-8 text-lg font-extrabold rounded-2xl shadow-lg shadow-orange-500/20 border-0 transition-transform hover:-translate-y-0.5"
               >
-                <Calculator className="w-5 h-5 mr-2" />
-                Calculate Savings
+                <Calculator className="w-6 h-6 mr-2" />
+                Analyze Savings
               </Button>
 
               {/* Assumptions Toggle */}
               <button
                 onClick={() => setShowAssumptions(!showAssumptions)}
-                className="flex items-center gap-2 text-gray-400 hover:text-white mt-6 text-sm"
+                className="flex items-center gap-2 text-slate-400 hover:text-orange-600 mt-8 text-sm font-bold transition-colors mx-auto"
               >
                 <Info className="w-4 h-4" />
-                Calculation Assumptions
-                {showAssumptions ? (
-                  <ChevronUp className="w-4 h-4" />
-                ) : (
-                  <ChevronDown className="w-4 h-4" />
-                )}
+                How we calculate this
+                {showAssumptions ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
               </button>
 
-              {/* Assumptions */}
               {showAssumptions && settings && (
-                <div className="mt-4 p-4 rounded-xl bg-white/5 space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Electricity Tariff:</span>
-                    <span className="text-white">₹{settings.tariff_per_kwh}/kWh</span>
+                <div className="mt-6 p-6 rounded-2xl bg-slate-50 border border-slate-100 space-y-3 text-sm animate-in fade-in slide-in-from-top-2">
+                  <div className="flex justify-between font-medium">
+                    <span className="text-slate-500">Grid Tariff</span>
+                    <span className="text-slate-800 font-bold">₹{settings.tariff_per_kwh}/kWh</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Generation per kW:</span>
-                    <span className="text-white">{settings.kwh_per_kw_per_month} kWh/month</span>
+                  <div className="flex justify-between font-medium">
+                    <span className="text-slate-500">Gen per kW</span>
+                    <span className="text-slate-800 font-bold">{settings.kwh_per_kw_per_month} kWh/m</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">System Cost:</span>
-                    <span className="text-white">₹{formatNumber(settings.system_cost_per_kw)}/kW</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Government Subsidy:</span>
-                    <span className="text-white">{settings.subsidy_percentage}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Maintenance Cost:</span>
-                    <span className="text-white">₹{settings.maintenance_cost_per_kw_year}/kW/year</span>
+                  <div className="flex justify-between font-medium text-emerald-600">
+                    <span className="text-slate-500">Subsidy</span>
+                    <span className="font-extrabold">{settings.subsidy_percentage}% Applicable</span>
                   </div>
                 </div>
               )}
             </div>
 
             {/* Results Section */}
-            <div>
+            <div className="lg:sticky lg:top-32">
               {results ? (
-                <div className="space-y-6">
+                <div className="space-y-6 animate-in zoom-in-95 duration-500">
                   {/* Main Savings Card */}
-                  <div className="bg-gradient-to-br from-[#c4ff00]/20 to-[#8bc34a]/20 rounded-3xl p-6 sm:p-8 border border-[#c4ff00]/30">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-12 h-12 rounded-full bg-[#c4ff00]/20 flex items-center justify-center">
-                        <TrendingUp className="w-6 h-6 text-[#c4ff00]" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-bold text-white">Estimated Yearly Savings</h3>
-                        <p className="text-gray-400 text-sm">Based on your usage</p>
-                      </div>
+                  <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2.5rem] p-8 sm:p-10 text-white shadow-2xl relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-8 opacity-10">
+                      <TrendingUp className="w-32 h-32" />
                     </div>
-                    <div className="text-4xl sm:text-5xl font-bold text-[#c4ff00] mb-2">
-                      {formatCurrency(results.yearlySavings)}
-                    </div>
-                    <div className="text-gray-400">
-                      That&apos;s{' '}
-                      <span className="text-white font-medium">
-                        {formatCurrency(results.monthlySavings)}
-                      </span>{' '}
-                      per month
+                    <div className="relative z-10">
+                      <h3 className="text-orange-400 font-extrabold uppercase tracking-widest text-xs mb-2">Estimated Annual Savings</h3>
+                      <div className="text-5xl sm:text-6xl font-extrabold text-white mb-4 tracking-tight">
+                        {formatCurrency(results.yearlySavings)}
+                      </div>
+                      <div className="text-slate-300 font-medium text-lg">
+                        Reducing your bill by <span className="text-orange-400 font-bold">{formatNumber(results.savingsPercentage)}%</span>
+                      </div>
                     </div>
                   </div>
 
                   {/* Stats Grid */}
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-[#1a1a1a] rounded-2xl p-5 border border-white/10">
-                      <div className="text-gray-400 text-sm mb-1">Recommended System</div>
-                      <div className="text-2xl font-bold text-white">
-                        {formatNumber(results.recommendedSystemSize)} kW
-                      </div>
+                    <div className="bg-white rounded-[2rem] p-6 border border-amber-100 shadow-sm">
+                      <div className="text-slate-400 font-bold text-[10px] uppercase tracking-wider mb-1">Recommended Size</div>
+                      <div className="text-2xl font-extrabold text-slate-800">{formatNumber(results.recommendedSystemSize)} kW</div>
                     </div>
-                    <div className="bg-[#1a1a1a] rounded-2xl p-5 border border-white/10">
-                      <div className="text-gray-400 text-sm mb-1">Savings Coverage</div>
-                      <div className="text-2xl font-bold text-white">
-                        {formatNumber(results.savingsPercentage, 0)}%
-                      </div>
-                    </div>
-                    <div className="bg-[#1a1a1a] rounded-2xl p-5 border border-white/10">
-                      <div className="text-gray-400 text-sm mb-1">Payback Period</div>
-                      <div className="text-2xl font-bold text-white">
-                        {formatNumber(results.paybackPeriod, 1)} years
-                      </div>
-                    </div>
-                    <div className="bg-[#1a1a1a] rounded-2xl p-5 border border-white/10">
-                      <div className="text-gray-400 text-sm mb-1">25-Year Savings</div>
-                      <div className="text-2xl font-bold text-[#c4ff00]">
-                        {formatCurrency(results.twentyFiveYearSavings)}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Cost Breakdown */}
-                  <div className="bg-[#1a1a1a] rounded-2xl p-6 border border-white/10">
-                    <h3 className="text-lg font-bold text-white mb-4">Cost Breakdown</h3>
-                    <div className="space-y-3">
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">System Cost</span>
-                        <span className="text-white">{formatCurrency(results.systemCost)}</span>
-                      </div>
-                      <div className="flex justify-between text-green-400">
-                        <span>Government Subsidy</span>
-                        <span>-{formatCurrency(results.subsidyAmount)}</span>
-                      </div>
-                      <div className="border-t border-white/10 pt-3 flex justify-between">
-                        <span className="text-white font-medium">Net Cost</span>
-                        <span className="text-[#c4ff00] font-medium">
-                          {formatCurrency(results.netCost)}
-                        </span>
-                      </div>
+                    <div className="bg-white rounded-[2rem] p-6 border border-amber-100 shadow-sm">
+                      <div className="text-slate-400 font-bold text-[10px] uppercase tracking-wider mb-1">Payback Period</div>
+                      <div className="text-2xl font-extrabold text-slate-800">{formatNumber(results.paybackPeriod, 1)} Years</div>
                     </div>
                   </div>
 
                   {/* Environmental Impact */}
-                  <div className="bg-[#1a1a1a] rounded-2xl p-6 border border-white/10">
+                  <div className="bg-emerald-50 rounded-[2rem] p-8 border border-emerald-100">
                     <div className="flex items-center gap-3 mb-4">
-                      <Leaf className="w-5 h-5 text-green-400" />
-                      <h3 className="text-lg font-bold text-white">Environmental Impact</h3>
+                      <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center border border-emerald-200">
+                        <Leaf className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <h3 className="text-lg font-extrabold text-emerald-900">Green Impact</h3>
                     </div>
-                    <p className="text-gray-400 mb-2">
-                      Over 25 years, your solar system will prevent approximately
-                    </p>
-                    <div className="text-3xl font-bold text-green-400">
-                      {formatNumber(results.co2Reduction / 1000, 1)} tonnes
+                    <p className="text-emerald-800/70 font-medium mb-3">Your system will offset approx.</p>
+                    <div className="text-4xl font-extrabold text-emerald-600 leading-none mb-1">
+                      {formatNumber(results.co2Reduction / 1000, 1)} Tonnes
                     </div>
-                    <p className="text-gray-400 text-sm">of CO₂ emissions</p>
+                    <p className="text-emerald-800/70 font-bold text-sm">of CO₂ over 25 years</p>
                   </div>
 
                   {/* CTA */}
                   <Link to="/contact">
-                    <Button className="w-full bg-[#c4ff00] text-black hover:bg-[#d4ff33] py-6 text-lg font-semibold">
-                      Get Your Free Quote
+                    <Button className="w-full bg-slate-900 text-white hover:bg-slate-800 py-8 text-lg font-bold rounded-2xl shadow-xl transition-all hover:-translate-y-1">
+                      Get Expert Consultation
                       <ArrowRight className="w-5 h-5 ml-2" />
                     </Button>
                   </Link>
                 </div>
               ) : (
-                <div className="h-full flex items-center justify-center bg-[#1a1a1a] rounded-3xl p-8 border border-white/10 border-dashed">
-                  <div className="text-center">
-                    <Calculator className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-white mb-2">Ready to Calculate?</h3>
-                    <p className="text-gray-400 text-sm">
-                      Enter your electricity details and click Calculate to see your potential savings
-                    </p>
+                <div className="h-full min-h-[400px] flex flex-col items-center justify-center bg-white rounded-[2.5rem] p-10 border-2 border-amber-100 border-dashed text-center">
+                  <div className="w-20 h-20 rounded-full bg-amber-50 flex items-center justify-center mb-6">
+                    <TrendingUp className="w-10 h-10 text-amber-200" />
                   </div>
+                  <h3 className="text-xl font-extrabold text-slate-800 mb-2">See your potential</h3>
+                  <p className="text-slate-500 font-medium max-w-xs">
+                    Fill in your electricity details to see how much you can save by going solar.
+                  </p>
                 </div>
               )}
             </div>

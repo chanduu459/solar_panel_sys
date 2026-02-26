@@ -74,13 +74,14 @@ const Hero = () => {
     });
     parallaxTriggers.push(titleTrigger);
 
+    // Darkens the overlay as you scroll down to keep text legible
     const overlayTrigger = ScrollTrigger.create({
       trigger: section,
       start: 'top top',
       end: 'bottom top',
       scrub: true,
       onUpdate: (self) => {
-        gsap.set(overlay, { opacity: self.progress * 0.3 });
+        gsap.set(overlay, { opacity: self.progress * 0.5 });
       },
     });
     parallaxTriggers.push(overlayTrigger);
@@ -96,7 +97,7 @@ const Hero = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative h-[100svh] w-full overflow-hidden"
+      className="relative h-[100svh] w-full overflow-hidden bg-slate-900 font-sans"
     >
       {/* Background Image with Ken Burns */}
       <div
@@ -111,24 +112,27 @@ const Hero = () => {
         />
       </div>
 
-      {/* Gradient overlay for depth */}
+      {/* Sunlit warm overlay to match the theme's vibe */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/20 to-orange-500/10 mix-blend-overlay pointer-events-none" />
+
+      {/* Gradient overlay for depth (GSAP controlled) */}
       <div
         ref={overlayRef}
-        className="absolute inset-0 bg-kaleo-charcoal opacity-0"
+        className="absolute inset-0 bg-slate-950 opacity-0"
         style={{ willChange: 'opacity' }}
       />
 
-      {/* Subtle fog effect overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-kaleo-sand/20" />
+      {/* Subtle fog effect overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-900/30 via-transparent to-white/10 pointer-events-none" />
 
       {/* Content */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center z-10">
+        
         {/* Main Title */}
         <h1
           ref={titleRef}
-          className="font-display text-kaleo-cream text-display tracking-tight select-none"
+          className="font-extrabold text-white text-5xl sm:text-6xl md:text-7xl lg:text-8xl tracking-tight select-none drop-shadow-xl"
           style={{
-            textShadow: '0 4px 30px rgba(0,0,0,0.3)',
             willChange: 'transform, opacity'
           }}
         >
@@ -138,15 +142,15 @@ const Hero = () => {
         {/* Subtitle */}
         <p
           ref={subtitleRef}
-          className="font-body text-kaleo-cream/90 text-sm md:text-base uppercase tracking-[0.3em] mt-6"
+          className="text-amber-400 text-sm sm:text-base md:text-lg uppercase tracking-[0.25em] font-bold mt-6 drop-shadow-md"
           style={{ willChange: 'transform, opacity' }}
         >
           {heroConfig.subtitle}
         </p>
       </div>
 
-      {/* Bottom gradient for seamless transition */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-kaleo-sand to-transparent" />
+      {/* Bottom gradient for seamless transition into the white background sections below */}
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-white via-white/80 to-transparent z-20 pointer-events-none" />
     </section>
   );
 };

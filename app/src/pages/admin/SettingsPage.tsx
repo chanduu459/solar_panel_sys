@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { 
   Settings, 
   Save, 
@@ -8,7 +8,12 @@ import {
   Calculator,
   Sun,
   Loader2,
-  CheckCircle
+  CheckCircle,
+  LayoutDashboard,
+  FolderOpen,
+  Star,
+  Mail,
+  LogOut
 } from 'lucide-react';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -17,11 +22,22 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useData } from '../../contexts/DataContext';
 import { toast } from 'sonner';
 
+// Sidebar Configuration
+const sidebarLinks = [
+  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/projects', label: 'Projects', icon: FolderOpen },
+  { href: '/admin/reviews', label: 'Reviews', icon: Star },
+  { href: '/admin/inquiries', label: 'Inquiries', icon: Mail },
+  { href: '/admin/settings', label: 'Settings', icon: Settings },
+];
+
 export default function AdminSettingsPage() {
-  const { signOut } = useAuth();
+  const { user, signOut, isAdmin } = useAuth();
   const { settings, fetchSettings, updateSettings } = useData();
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const location = useLocation();
+
   const [formData, setFormData] = useState({
     org_name: '',
     contact_email: '',
@@ -94,69 +110,104 @@ export default function AdminSettingsPage() {
     setIsSaving(false);
   };
 
-  const sidebarLinks = [
-    { href: '/admin', label: 'Dashboard', icon: Settings },
-    { href: '/admin/projects', label: 'Projects', icon: Settings },
-    { href: '/admin/reviews', label: 'Reviews', icon: Settings },
-    { href: '/admin/inquiries', label: 'Inquiries', icon: Settings },
-    { href: '/admin/settings', label: 'Settings', icon: Settings },
-  ];
+  const inputClasses = "bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-orange-400 focus:ring-orange-400/20 transition-all shadow-sm rounded-xl py-2.5";
+  const labelClasses = "text-slate-700 font-bold text-sm mb-1.5 block";
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50/50 to-white text-slate-800 font-sans selection:bg-amber-200">
       <div className="flex">
         {/* Sidebar */}
-        <aside className="w-64 min-h-screen bg-[#1a1a1a] border-r border-white/10 fixed left-0 top-0 z-50 hidden lg:block">
-          <div className="p-6 border-b border-white/10">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c4ff00] to-[#8bc34a] flex items-center justify-center">
-                <Settings className="w-5 h-5 text-black" />
+        <aside className="w-64 min-h-screen bg-white/80 backdrop-blur-xl border-r border-amber-100/50 fixed left-0 top-0 z-50 hidden lg:flex flex-col shadow-[4px_0_24px_-12px_rgba(0,0,0,0.1)]">
+          {/* Logo */}
+          <div className="p-6 border-b border-amber-100/50">
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:shadow-orange-500/40 transition-shadow">
+                <Sun className="w-6 h-6 text-white" />
               </div>
               <div>
-                <span className="font-bold text-white">Solar Systems</span>
-                <span className="block text-xs text-gray-500">Admin Panel</span>
+                <span className="font-bold text-slate-800 text-lg tracking-tight">Solar Systems</span>
+                <span className="block text-xs font-bold text-orange-500 uppercase tracking-wider">Admin Panel</span>
               </div>
             </Link>
           </div>
-          <nav className="p-4 space-y-1">
-            {sidebarLinks.map((link) => (
-              <Link
-                key={link.href}
-                to={link.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                  link.href === '/admin/settings'
-                    ? 'bg-[#c4ff00] text-black'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <link.icon className="w-5 h-5" />
-                {link.label}
-              </Link>
-            ))}
+
+          {/* Navigation */}
+          <nav className="p-4 space-y-1.5 flex-1 overflow-y-auto">
+            {sidebarLinks.map((link) => {
+              const Icon = link.icon;
+              const isActive = location.pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-semibold ${
+                    isActive
+                      ? 'bg-gradient-to-r from-amber-100 to-orange-50 text-orange-700 shadow-sm'
+                      : 'text-slate-500 hover:text-orange-600 hover:bg-orange-50/50'
+                  }`}
+                >
+                  <Icon className={`w-5 h-5 ${isActive ? 'text-orange-600' : 'text-slate-400'}`} />
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
+
+          {/* User & Logout */}
+          <div className="p-4 border-t border-amber-100/50 bg-white/50">
+            <div className="flex items-center gap-3 mb-4 px-2">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-100 to-amber-100 border border-orange-200 flex items-center justify-center text-orange-700 font-bold uppercase">
+                {user?.email?.charAt(0) || 'A'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-slate-800 truncate">{user?.email}</p>
+                <p className="text-xs font-medium text-slate-500">{isAdmin ? 'Administrator' : 'User'}</p>
+              </div>
+            </div>
             <button
               onClick={signOut}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-400 hover:text-red-400 hover:bg-red-400/10 transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors font-semibold"
             >
-              <Settings className="w-5 h-5" />
+              <LogOut className="w-5 h-5" />
               Sign Out
             </button>
           </div>
         </aside>
 
+        {/* Mobile Sidebar */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-amber-100 z-50 pb-safe shadow-[0_-4px_24px_-12px_rgba(0,0,0,0.1)]">
+          <nav className="flex justify-around p-2">
+            {sidebarLinks.map((link) => {
+              const Icon = link.icon;
+              const isActive = location.pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${
+                    isActive ? 'text-orange-600' : 'text-slate-400 hover:text-orange-500'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-[10px] font-bold">{link.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+
         {/* Main Content */}
-        <main className="flex-1 lg:ml-64">
-          <header className="sticky top-0 z-40 bg-[#0a0a0a]/95 backdrop-blur-md border-b border-white/10 px-6 py-4">
-            <div className="flex items-center justify-between">
-              <h1 className="text-xl font-bold text-white">Settings</h1>
+        <main className="flex-1 lg:ml-64 pb-20 lg:pb-0">
+          <header className="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-amber-100/50 px-6 py-4 shadow-sm">
+            <div className="flex items-center justify-between max-w-5xl mx-auto">
+              <h1 className="text-xl font-extrabold text-slate-800">Global Settings</h1>
               <Button
                 onClick={handleSave}
                 disabled={isSaving || isSaved}
-                className={`${
+                className={`font-bold shadow-md ${
                   isSaved
-                    ? 'bg-green-500 text-white'
-                    : 'bg-[#c4ff00] text-black hover:bg-[#d4ff33]'
+                    ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/20'
+                    : 'bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 shadow-orange-500/20 border-0'
                 }`}
               >
                 {isSaving ? (
@@ -166,202 +217,206 @@ export default function AdminSettingsPage() {
                 ) : (
                   <Save className="w-4 h-4 mr-2" />
                 )}
-                {isSaved ? 'Saved' : 'Save Changes'}
+                {isSaved ? 'Settings Saved' : 'Save Changes'}
               </Button>
             </div>
           </header>
 
-          <div className="p-6 max-w-4xl">
+          <div className="p-6 max-w-5xl mx-auto space-y-10 mt-4">
+            
             {/* Organization Settings */}
-            <section className="mb-10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-[#c4ff00]/20 flex items-center justify-center">
-                  <Building2 className="w-5 h-5 text-[#c4ff00]" />
+            <section>
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center shadow-sm border border-orange-200">
+                  <Building2 className="w-6 h-6 text-orange-500" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-white">Organization</h2>
-                  <p className="text-sm text-gray-400">Company information and contact details</p>
+                  <h2 className="text-2xl font-extrabold text-slate-800">Organization Info</h2>
+                  <p className="text-sm font-medium text-slate-500">Public company information and contact details</p>
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-6 p-6 rounded-2xl bg-[#1a1a1a] border border-white/10">
-                <div className="space-y-2">
-                  <Label className="text-gray-300">Organization Name</Label>
+              <div className="grid sm:grid-cols-2 gap-6 p-8 rounded-3xl bg-white border border-amber-100 shadow-sm">
+                <div>
+                  <Label className={labelClasses}>Organization Name</Label>
                   <Input
                     value={formData.org_name}
                     onChange={(e) => handleChange('org_name', e.target.value)}
-                    className="bg-white/5 border-white/10 text-white"
+                    className={inputClasses}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-300">Contact Email</Label>
+                <div>
+                  <Label className={labelClasses}>Contact Email</Label>
                   <Input
                     type="email"
                     value={formData.contact_email}
                     onChange={(e) => handleChange('contact_email', e.target.value)}
-                    className="bg-white/5 border-white/10 text-white"
+                    className={inputClasses}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-300">Contact Phone</Label>
+                <div>
+                  <Label className={labelClasses}>Contact Phone</Label>
                   <Input
                     value={formData.contact_phone}
                     onChange={(e) => handleChange('contact_phone', e.target.value)}
-                    className="bg-white/5 border-white/10 text-white"
+                    className={inputClasses}
                   />
                 </div>
-                <div className="sm:col-span-2 space-y-2">
-                  <Label className="text-gray-300">Address</Label>
+                <div className="sm:col-span-2">
+                  <Label className={labelClasses}>Physical Address</Label>
                   <Input
                     value={formData.org_address}
                     onChange={(e) => handleChange('org_address', e.target.value)}
-                    className="bg-white/5 border-white/10 text-white"
+                    className={inputClasses}
                   />
                 </div>
               </div>
             </section>
 
             {/* Calculator Settings */}
-            <section className="mb-10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-[#c4ff00]/20 flex items-center justify-center">
-                  <Calculator className="w-5 h-5 text-[#c4ff00]" />
+            <section>
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-teal-100 flex items-center justify-center shadow-sm border border-emerald-200">
+                  <Calculator className="w-6 h-6 text-emerald-600" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-white">Calculator Settings</h2>
-                  <p className="text-sm text-gray-400">Parameters used for savings calculations</p>
+                  <h2 className="text-2xl font-extrabold text-slate-800">Calculator Parameters</h2>
+                  <p className="text-sm font-medium text-slate-500">Variables used for customer savings predictions</p>
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-6 p-6 rounded-2xl bg-[#1a1a1a] border border-white/10">
-                <div className="space-y-2">
-                  <Label className="text-gray-300">kWh per kW per Month</Label>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 p-8 rounded-3xl bg-white border border-amber-100 shadow-sm">
+                <div>
+                  <Label className={labelClasses}>kWh per kW per Month</Label>
                   <Input
                     type="number"
                     step="0.1"
                     value={formData.kwh_per_kw_per_month}
                     onChange={(e) => handleChange('kwh_per_kw_per_month', parseFloat(e.target.value))}
-                    className="bg-white/5 border-white/10 text-white"
+                    className={inputClasses}
                   />
-                  <p className="text-xs text-gray-500">Average solar generation per kW capacity</p>
+                  <p className="text-xs font-medium text-slate-400 mt-2">Avg generation per kW capacity</p>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-300">Tariff per kWh (₹)</Label>
+                <div>
+                  <Label className={labelClasses}>Tariff per kWh (₹)</Label>
                   <Input
                     type="number"
                     step="0.1"
                     value={formData.tariff_per_kwh}
                     onChange={(e) => handleChange('tariff_per_kwh', parseFloat(e.target.value))}
-                    className="bg-white/5 border-white/10 text-white"
+                    className={inputClasses}
                   />
-                  <p className="text-xs text-gray-500">Average electricity rate</p>
+                  <p className="text-xs font-medium text-slate-400 mt-2">Current grid electricity rate</p>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-300">System Cost per kW (₹)</Label>
+                <div>
+                  <Label className={labelClasses}>System Cost per kW (₹)</Label>
                   <Input
                     type="number"
                     value={formData.system_cost_per_kw}
                     onChange={(e) => handleChange('system_cost_per_kw', parseFloat(e.target.value))}
-                    className="bg-white/5 border-white/10 text-white"
+                    className={inputClasses}
                   />
-                  <p className="text-xs text-gray-500">Average installation cost</p>
+                  <p className="text-xs font-medium text-slate-400 mt-2">Average installation base cost</p>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-300">Subsidy Percentage (%)</Label>
+                <div>
+                  <Label className={labelClasses}>Subsidy Percentage (%)</Label>
                   <Input
                     type="number"
                     step="0.1"
                     value={formData.subsidy_percentage}
                     onChange={(e) => handleChange('subsidy_percentage', parseFloat(e.target.value))}
-                    className="bg-white/5 border-white/10 text-white"
+                    className={inputClasses}
                   />
-                  <p className="text-xs text-gray-500">Government subsidy rate</p>
+                  <p className="text-xs font-medium text-slate-400 mt-2">Applicable government subsidy rate</p>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-300">Maintenance Cost per kW/Year (₹)</Label>
+                <div className="lg:col-span-2">
+                  <Label className={labelClasses}>Maintenance Cost per kW/Year (₹)</Label>
                   <Input
                     type="number"
                     value={formData.maintenance_cost_per_kw_year}
                     onChange={(e) => handleChange('maintenance_cost_per_kw_year', parseFloat(e.target.value))}
-                    className="bg-white/5 border-white/10 text-white"
+                    className={inputClasses}
                   />
-                  <p className="text-xs text-gray-500">Annual maintenance estimate</p>
+                  <p className="text-xs font-medium text-slate-400 mt-2">Annual expected maintenance costs</p>
                 </div>
               </div>
             </section>
 
-            {/* Carousel Settings */}
-            <section className="mb-10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-[#c4ff00]/20 flex items-center justify-center">
-                  <Sun className="w-5 h-5 text-[#c4ff00]" />
+            <div className="grid md:grid-cols-2 gap-10">
+              {/* Carousel Settings */}
+              <section>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center shadow-sm border border-blue-200">
+                    <Sun className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-extrabold text-slate-800">Interface</h2>
+                    <p className="text-sm font-medium text-slate-500">Website display tweaks</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-lg font-bold text-white">Carousel Settings</h2>
-                  <p className="text-sm text-gray-400">Homepage project carousel configuration</p>
-                </div>
-              </div>
 
-              <div className="p-6 rounded-2xl bg-[#1a1a1a] border border-white/10">
-                <div className="space-y-2 max-w-xs">
-                  <Label className="text-gray-300">Scroll Speed (seconds)</Label>
-                  <Input
-                    type="number"
-                    value={formData.carousel_speed}
-                    onChange={(e) => handleChange('carousel_speed', parseInt(e.target.value))}
-                    className="bg-white/5 border-white/10 text-white"
-                  />
-                  <p className="text-xs text-gray-500">Time for one complete cycle</p>
+                <div className="p-8 rounded-3xl bg-white border border-amber-100 shadow-sm h-[calc(100%-88px)]">
+                  <div className="max-w-xs">
+                    <Label className={labelClasses}>Carousel Speed (seconds)</Label>
+                    <Input
+                      type="number"
+                      value={formData.carousel_speed}
+                      onChange={(e) => handleChange('carousel_speed', parseInt(e.target.value))}
+                      className={inputClasses}
+                    />
+                    <p className="text-xs font-medium text-slate-400 mt-2">Time for one complete home page cycle</p>
+                  </div>
                 </div>
-              </div>
-            </section>
+              </section>
 
-            {/* Map Settings */}
-            <section className="mb-10">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-[#c4ff00]/20 flex items-center justify-center">
-                  <MapPin className="w-5 h-5 text-[#c4ff00]" />
+              {/* Map Settings */}
+              <section>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-rose-100 to-pink-100 flex items-center justify-center shadow-sm border border-rose-200">
+                    <MapPin className="w-6 h-6 text-rose-500" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-extrabold text-slate-800">Map Defaults</h2>
+                    <p className="text-sm font-medium text-slate-500">Initial map center and zoom level</p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-lg font-bold text-white">Map Settings</h2>
-                  <p className="text-sm text-gray-400">Default map center and zoom level</p>
-                </div>
-              </div>
 
-              <div className="grid sm:grid-cols-3 gap-6 p-6 rounded-2xl bg-[#1a1a1a] border border-white/10">
-                <div className="space-y-2">
-                  <Label className="text-gray-300">Center Latitude</Label>
-                  <Input
-                    type="number"
-                    step="any"
-                    value={formData.map_center_lat}
-                    onChange={(e) => handleChange('map_center_lat', parseFloat(e.target.value))}
-                    className="bg-white/5 border-white/10 text-white"
-                  />
+                <div className="grid sm:grid-cols-2 gap-6 p-8 rounded-3xl bg-white border border-amber-100 shadow-sm">
+                  <div>
+                    <Label className={labelClasses}>Latitude</Label>
+                    <Input
+                      type="number"
+                      step="any"
+                      value={formData.map_center_lat}
+                      onChange={(e) => handleChange('map_center_lat', parseFloat(e.target.value))}
+                      className={inputClasses}
+                    />
+                  </div>
+                  <div>
+                    <Label className={labelClasses}>Longitude</Label>
+                    <Input
+                      type="number"
+                      step="any"
+                      value={formData.map_center_lng}
+                      onChange={(e) => handleChange('map_center_lng', parseFloat(e.target.value))}
+                      className={inputClasses}
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Label className={labelClasses}>Default Zoom Level</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      max="20"
+                      value={formData.map_zoom}
+                      onChange={(e) => handleChange('map_zoom', parseInt(e.target.value))}
+                      className={inputClasses}
+                    />
+                  </div>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-300">Center Longitude</Label>
-                  <Input
-                    type="number"
-                    step="any"
-                    value={formData.map_center_lng}
-                    onChange={(e) => handleChange('map_center_lng', parseFloat(e.target.value))}
-                    className="bg-white/5 border-white/10 text-white"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-gray-300">Zoom Level</Label>
-                  <Input
-                    type="number"
-                    min="1"
-                    max="20"
-                    value={formData.map_zoom}
-                    onChange={(e) => handleChange('map_zoom', parseInt(e.target.value))}
-                    className="bg-white/5 border-white/10 text-white"
-                  />
-                </div>
-              </div>
-            </section>
+              </section>
+            </div>
+            
           </div>
         </main>
       </div>

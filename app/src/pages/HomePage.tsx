@@ -19,7 +19,7 @@ export default function HomePage() {
   }, [fetchProjects, fetchApprovedReviews, fetchSettings]);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#1a0a2e] via-purple-950/40 to-[#0c0a1a] text-white">
       <Header />
       <main>
         <Hero />

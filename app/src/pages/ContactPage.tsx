@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle, Loader2, MessageSquare, User } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Send, CheckCircle, Loader2, MessageSquare, User,  } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
@@ -60,12 +60,12 @@ export default function ContactPage() {
 
       if (result) {
         setIsSubmitted(true);
-        toast.success('Message sent successfully! We will contact you soon.');
+        toast.success('Message sent successfully!');
       } else {
-        toast.error('Failed to send message. Please try again.');
+        toast.error('Failed to send message.');
       }
     } catch (error) {
-      toast.error('An error occurred. Please try again later.');
+      toast.error('An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -86,10 +86,8 @@ export default function ContactPage() {
     },
     {
       icon: MapPin,
-      title: 'Address',
-      content:
-        settings?.org_address ||
-        'Solar Tower, 101 Green Energy Road, Mumbai, Maharashtra 400001',
+      title: 'Headquarters',
+      content: settings?.org_address || 'Solar Tower, Green Energy Road, Mumbai, MH',
       href: '#',
     },
     {
@@ -100,127 +98,122 @@ export default function ContactPage() {
     },
   ];
 
+  const inputClasses = "bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-orange-400 focus:ring-orange-400/20 shadow-sm rounded-xl py-6 font-medium";
+
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-white text-slate-800 selection:bg-amber-200">
       <Header />
 
-      <main className="pt-24 pb-16">
+      <main className="pt-32 pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-              Get in Touch
+          <div className="text-center mb-16">
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-4 tracking-tight">
+              Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">Touch</span>
             </h1>
-            <p className="text-gray-400 max-w-2xl mx-auto">
-              Have questions about solar energy? We&apos;re here to help. 
-              Reach out to us and our team will get back to you within 24 hours.
+            <p className="text-lg text-slate-600 font-medium max-w-2xl mx-auto leading-relaxed">
+              Have questions about solar energy? We're here to help. Reach out to us and our team will get back to you within 24 hours.
             </p>
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8 lg:gap-12">
-            {/* Contact Info */}
-            <div className="lg:col-span-1 space-y-6">
+            {/* Contact Info Column */}
+            <div className="lg:col-span-1 space-y-4">
               {contactInfo.map((item, index) => {
                 const Icon = item.icon;
                 return (
                   <a
                     key={index}
                     href={item.href}
-                    className="flex items-start gap-4 p-5 rounded-2xl bg-[#1a1a1a] border border-white/10 hover:border-[#c4ff00]/50 transition-all group"
+                    className="flex items-center gap-5 p-6 rounded-[2rem] bg-white border border-amber-100 shadow-sm hover:shadow-xl hover:shadow-orange-500/5 hover:border-orange-200 transition-all group"
                   >
-                    <div className="w-12 h-12 rounded-xl bg-[#c4ff00]/20 flex items-center justify-center flex-shrink-0 group-hover:bg-[#c4ff00]/30 transition-colors">
-                      <Icon className="w-5 h-5 text-[#c4ff00]" />
+                    <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center flex-shrink-0 group-hover:bg-orange-500 transition-all duration-300">
+                      <Icon className="w-6 h-6 text-orange-600 group-hover:text-white" />
                     </div>
                     <div>
-                      <h3 className="font-medium text-white mb-1">{item.title}</h3>
-                      <p className="text-gray-400 text-sm">{item.content}</p>
+                      <h3 className="font-extrabold text-slate-800 text-base">{item.title}</h3>
+                      <p className="text-slate-500 font-medium text-sm">{item.content}</p>
                     </div>
                   </a>
                 );
               })}
 
-              {/* Map Preview */}
-              <div className="rounded-2xl overflow-hidden border border-white/10 h-48 bg-[#1a1a1a]">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d241317.1160992995!2d72.7410995431222!3d19.082197839405396!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c6306644edc1%3A0x5da4ed8f8d648c69!2sMumbai%2C%20Maharashtra!5e0!3m2!1sen!2sin!4v1704067200000!5m2!1sen!2sin"
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0, filter: 'grayscale(100%) invert(92%)' }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Office Location"
-                />
-              </div>
+             {/* Map Preview */}
+<div className="rounded-[2rem] overflow-hidden border border-amber-100 h-64 bg-slate-100 shadow-sm">
+  <iframe
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d124043.6826647915!2d79.91617488358482!3d14.4425987!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a4cf12a06958771%3A0xd3036c2025161f55!2sNellore%2C%20Andhra%20Pradesh!5e0!3m2!1sen!2sin!4v1710000000000!5m2!1sen!2sin"
+    width="100%"
+    height="100%"
+    style={{ border: 0 }}
+    allowFullScreen
+    loading="lazy"
+    title="Office Location in Nellore"
+    referrerPolicy="no-referrer-when-downgrade"
+  />
+</div>
             </div>
 
-            {/* Contact Form */}
+            {/* Contact Form Column */}
             <div className="lg:col-span-2">
               {isSubmitted ? (
-                <div className="bg-[#1a1a1a] rounded-3xl p-8 sm:p-12 border border-white/10 text-center">
-                  <div className="w-20 h-20 rounded-full bg-[#c4ff00]/20 flex items-center justify-center mx-auto mb-6">
-                    <CheckCircle className="w-10 h-10 text-[#c4ff00]" />
+                <div className="bg-white rounded-[2.5rem] p-12 border border-amber-100 shadow-xl text-center h-full flex flex-col items-center justify-center">
+                  <div className="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center mb-6">
+                    <CheckCircle className="w-12 h-12 text-emerald-500" />
                   </div>
-                  <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-                    Thank You!
-                  </h2>
-                  <p className="text-gray-400 mb-6 max-w-md mx-auto">
-                    Your message has been sent successfully. Our team will review your 
-                    request and get back to you within 24-48 hours.
+                  <h2 className="text-3xl font-extrabold text-slate-800 mb-4">Message Sent!</h2>
+                  <p className="text-slate-500 font-medium mb-8 max-w-md mx-auto text-lg leading-relaxed">
+                    Thank you for reaching out. Our solar experts will review your request and contact you within 24-48 hours.
                   </p>
                   <Button
                     onClick={() => {
                       setIsSubmitted(false);
                       setFormData({ name: '', email: '', phone: '', message: '' });
                     }}
-                    className="bg-[#c4ff00] text-black hover:bg-[#d4ff33] rounded-full px-8"
+                    className="bg-slate-900 text-white hover:bg-slate-800 rounded-full px-10 py-6 font-bold transition-transform hover:-translate-y-1"
                   >
                     Send Another Message
                   </Button>
                 </div>
               ) : (
-                <div className="bg-[#1a1a1a] rounded-3xl p-6 sm:p-8 border border-white/10">
-                  <h2 className="text-xl font-bold text-white mb-6">Send Us a Message</h2>
+                <div className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-amber-100 shadow-xl shadow-orange-900/5">
+                  <h2 className="text-2xl font-extrabold text-slate-800 mb-8">Send Us a Message</h2>
 
-                  <form onSubmit={handleSubmit} className="space-y-5">
-                    {/* Name */}
+                  <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="space-y-2">
-                      <Label htmlFor="name" className="text-gray-300 flex items-center gap-2">
-                        <User className="w-4 h-4" />
-                        Full Name
+                      <Label htmlFor="name" className="text-slate-700 font-bold ml-1 flex items-center gap-2">
+                        <User className="w-4 h-4 text-orange-500" /> Full Name
                       </Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        type="text"
-                        placeholder="Enter your full name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#c4ff00] focus:ring-[#c4ff00]/20"
-                      />
+                      <div className="relative">
+                        <Input
+                          id="name"
+                          name="name"
+                          type="text"
+                          placeholder="John Doe"
+                          value={formData.name}
+                          onChange={handleChange}
+                          className={inputClasses.replace("pl-12", "pl-6")}
+                        />
+                      </div>
                     </div>
 
-                    {/* Email & Phone */}
-                    <div className="grid sm:grid-cols-2 gap-5">
+                    <div className="grid sm:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="email" className="text-gray-300 flex items-center gap-2">
-                          <Mail className="w-4 h-4" />
-                          Email
+                        <Label htmlFor="email" className="text-slate-700 font-bold ml-1 flex items-center gap-2">
+                          <Mail className="w-4 h-4 text-orange-500" /> Email
                         </Label>
                         <Input
                           id="email"
                           name="email"
                           type="email"
-                          placeholder="your@email.com"
+                          placeholder="john@example.com"
                           value={formData.email}
                           onChange={handleChange}
-                          className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#c4ff00] focus:ring-[#c4ff00]/20"
+                          className={inputClasses.replace("pl-12", "pl-6")}
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="phone" className="text-gray-300 flex items-center gap-2">
-                          <Phone className="w-4 h-4" />
-                          Phone
+                        <Label htmlFor="phone" className="text-slate-700 font-bold ml-1 flex items-center gap-2">
+                          <Phone className="w-4 h-4 text-orange-500" /> Phone
                         </Label>
                         <Input
                           id="phone"
@@ -229,50 +222,41 @@ export default function ContactPage() {
                           placeholder="+91 98765 43210"
                           value={formData.phone}
                           onChange={handleChange}
-                          className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#c4ff00] focus:ring-[#c4ff00]/20"
+                          className={inputClasses.replace("pl-12", "pl-6")}
                         />
                       </div>
                     </div>
 
-                    {/* Message */}
                     <div className="space-y-2">
-                      <Label htmlFor="message" className="text-gray-300 flex items-center gap-2">
-                        <MessageSquare className="w-4 h-4" />
-                        Message
+                      <Label htmlFor="message" className="text-slate-700 font-bold ml-1 flex items-center gap-2">
+                        <MessageSquare className="w-4 h-4 text-orange-500" /> Message
                       </Label>
                       <Textarea
                         id="message"
                         name="message"
-                        placeholder="Tell us about your requirements..."
+                        placeholder="I'm interested in solar for my home..."
                         value={formData.message}
                         onChange={handleChange}
                         rows={5}
-                        className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-[#c4ff00] focus:ring-[#c4ff00]/20 resize-none"
+                        className="bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-orange-400 focus:ring-orange-400/20 shadow-sm rounded-2xl p-6 font-medium resize-none"
                       />
                     </div>
 
-                    {/* Submit */}
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full bg-[#c4ff00] text-black hover:bg-[#d4ff33] rounded-xl py-6 font-semibold text-base"
+                      className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 py-8 text-lg font-extrabold rounded-2xl shadow-lg shadow-orange-500/20 border-0 transition-transform hover:-translate-y-0.5 mt-4"
                     >
                       {isSubmitting ? (
                         <>
-                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                          Sending...
+                          <Loader2 className="w-6 h-6 mr-2 animate-spin" /> Sending...
                         </>
                       ) : (
                         <>
-                          <Send className="w-5 h-5 mr-2" />
-                          Send Message
+                          <Send className="w-5 h-5 mr-2" /> Send Message
                         </>
                       )}
                     </Button>
-
-                    <p className="text-xs text-gray-500 text-center">
-                      By submitting, you agree to our privacy policy. We respect your privacy.
-                    </p>
                   </form>
                 </div>
               )}
@@ -280,35 +264,38 @@ export default function ContactPage() {
           </div>
 
           {/* FAQ Section */}
-          <div className="mt-16">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white text-center mb-8">
-              Frequently Asked Questions
+          <div className="mt-24">
+            <h2 className="text-3xl font-extrabold text-slate-900 text-center mb-12 tracking-tight">
+              Frequently Asked <span className="text-orange-500">Questions</span>
             </h2>
-            <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
               {[
                 {
                   q: 'How much does a solar installation cost?',
-                  a: 'The cost depends on your energy needs and roof size. Use our calculator to get an estimate, or contact us for a free site assessment.',
+                  a: 'Costs depend on your energy needs and roof size. Use our savings calculator to get an instant estimate.',
                 },
                 {
                   q: 'How long does installation take?',
-                  a: 'Most residential installations are completed within 2-4 weeks. Commercial projects may take 4-8 weeks depending on size.',
+                  a: 'Residential projects usually take 2-4 weeks, while commercial systems may take 4-8 weeks depending on capacity.',
                 },
                 {
                   q: 'What government subsidies are available?',
-                  a: 'The Indian government offers subsidies up to 30% for residential solar installations. We help you avail all applicable benefits.',
+                  a: 'The Indian government offers significant subsidies for residential installations. We handle all paperwork for you.',
                 },
                 {
                   q: 'How long do solar panels last?',
-                  a: 'Solar panels typically last 25-30 years with minimal maintenance. We offer warranties and annual maintenance contracts.',
+                  a: 'Quality solar panels are designed to last 25-30 years with very minimal maintenance required.',
                 },
               ].map((faq, index) => (
                 <div
                   key={index}
-                  className="p-6 rounded-2xl bg-[#1a1a1a] border border-white/10"
+                  className="p-8 rounded-[2rem] bg-white border border-amber-100 shadow-sm hover:border-orange-200 transition-colors group"
                 >
-                  <h3 className="font-medium text-white mb-2">{faq.q}</h3>
-                  <p className="text-gray-400 text-sm">{faq.a}</p>
+                  <h3 className="font-extrabold text-slate-800 mb-3 flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-orange-500" />
+                    {faq.q}
+                  </h3>
+                  <p className="text-slate-500 font-medium leading-relaxed pl-5">{faq.a}</p>
                 </div>
               ))}
             </div>

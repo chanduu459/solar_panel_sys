@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Zap, X } from 'lucide-react';
+import { Search, MapPin, Zap, X, ArrowRight } from 'lucide-react';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import { useData } from '../../contexts/DataContext';
@@ -61,22 +61,22 @@ export default function SearchSection() {
   const uniqueCities = [...new Set(projects.map((p) => p.city))].slice(0, 5);
 
   return (
-    <section className="py-16 sm:py-24 bg-[#0a0a0a]">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-16 sm:py-24 bg-gradient-to-b from-amber-50/40 to-white">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 tracking-tight">
-            Find Your Solar Solution
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4 tracking-tight">
+            Find Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-amber-500">Solar Solution</span>
           </h2>
-          <p className="text-gray-400 max-w-xl mx-auto">
-            Search by project name, city, or capacity
+          <p className="text-lg text-slate-600 font-medium max-w-xl mx-auto">
+            Search by project name, city, or installation capacity
           </p>
         </div>
 
-        {/* Search Bar */}
-        <div className="relative rounded-3xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-3 backdrop-blur-md shadow-2xl shadow-black/30">
-          <div className="flex items-center gap-2 p-2 rounded-2xl bg-[#111111]/80 border border-white/10 focus-within:border-[#c4ff00]/50 focus-within:ring-2 focus-within:ring-[#c4ff00]/20 transition-all">
-            <Search className="w-5 h-5 text-gray-400 ml-3" />
+        {/* Search Bar Container */}
+        <div className="relative rounded-[2rem] border border-amber-100 bg-white p-3 shadow-xl shadow-orange-500/5">
+          <div className="flex items-center gap-2 p-2 rounded-2xl bg-slate-50 border border-slate-100 focus-within:border-orange-400 focus-within:ring-4 focus-within:ring-orange-400/10 transition-all duration-300">
+            <Search className="w-6 h-6 text-orange-500 ml-3 shrink-0" />
             <Input
               type="text"
               placeholder="Search projects..."
@@ -87,20 +87,20 @@ export default function SearchSection() {
               }}
               onKeyDown={handleKeyDown}
               onFocus={() => setShowSuggestions(true)}
-              className="flex-1 bg-transparent border-0 text-white placeholder:text-gray-500 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+              className="flex-1 bg-transparent border-0 text-slate-800 placeholder:text-slate-400 focus-visible:ring-0 focus-visible:ring-offset-0 text-lg font-medium"
             />
             {query && (
               <button
                 onClick={clearSearch}
-                className="p-2 text-gray-400 hover:text-white transition-colors"
+                className="p-2 text-slate-400 hover:text-orange-500 hover:bg-orange-50 rounded-xl transition-colors"
                 aria-label="Clear search"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             )}
             <Button
               onClick={handleSearch}
-              className="bg-[#c4ff00] text-black hover:bg-[#d4ff33] rounded-xl px-7 font-semibold shadow-lg shadow-[#c4ff00]/20"
+              className="bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 rounded-xl px-8 py-6 text-base font-bold shadow-md shadow-orange-500/20 border-0 transition-transform hover:-translate-y-0.5"
             >
               Search
             </Button>
@@ -108,34 +108,35 @@ export default function SearchSection() {
 
           {/* Suggestions Dropdown */}
           {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-[#171717] border border-white/10 rounded-2xl overflow-hidden shadow-2xl z-50">
+            <div className="absolute top-full left-0 right-0 mt-4 bg-white border border-amber-100 rounded-3xl overflow-hidden shadow-2xl shadow-orange-900/10 z-50">
               {suggestions.map((project) => (
                 <button
                   key={project.id}
                   onClick={() => handleSuggestionClick(project)}
-                  className="w-full flex items-center gap-4 p-4 hover:bg-white/5 transition-colors text-left"
+                  className="w-full flex items-center gap-4 p-5 hover:bg-orange-50/50 transition-colors text-left border-b border-slate-50 group"
                 >
-                  <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center flex-shrink-0">
-                    <Zap className="w-6 h-6 text-[#c4ff00]" />
+                  <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <Zap className="w-5 h-5 text-orange-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-white truncate">
+                    <div className="font-extrabold text-slate-800 truncate text-lg group-hover:text-orange-600 transition-colors">
                       {project.title}
                     </div>
-                    <div className="flex items-center gap-3 text-sm text-gray-400">
+                    <div className="flex items-center gap-3 text-sm font-medium text-slate-500 mt-1">
                       <span className="flex items-center gap-1">
-                        <MapPin className="w-3 h-3" />
+                        <MapPin className="w-3.5 h-3.5 text-slate-400" />
                         {project.city}
                       </span>
-                      <span>•</span>
-                      <span>{project.capacity_kw} kW</span>
+                      <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                      <span className="text-amber-600 font-bold">{project.capacity_kw} kW</span>
                     </div>
                   </div>
+                  <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-orange-500 transform group-hover:translate-x-1 transition-all" />
                 </button>
               ))}
               <button
                 onClick={handleSearch}
-                className="w-full p-4 text-center text-[#c4ff00] hover:bg-white/5 transition-colors border-t border-white/10"
+                className="w-full p-4 text-center font-bold text-orange-600 hover:bg-orange-50 transition-colors bg-white"
               >
                 View all results
               </button>
@@ -145,8 +146,8 @@ export default function SearchSection() {
 
         {/* Quick City Filters */}
         {uniqueCities.length > 0 && (
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            <span className="text-sm text-gray-500">Popular cities:</span>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <span className="text-sm font-bold text-slate-400 uppercase tracking-wider">Popular locations:</span>
             {uniqueCities.map((city) => (
               <button
                 key={city}
@@ -154,7 +155,7 @@ export default function SearchSection() {
                   setQuery(city);
                   navigate(`/projects?city=${encodeURIComponent(city)}`);
                 }}
-                className="px-3 py-1 rounded-full text-sm bg-white/5 border border-white/10 text-gray-400 hover:bg-white/10 hover:text-white transition-colors"
+                className="px-4 py-2 rounded-full text-sm font-bold bg-white border border-slate-200 text-slate-600 hover:bg-orange-50 hover:text-orange-600 hover:border-orange-200 shadow-sm transition-all hover:-translate-y-0.5"
               >
                 {city}
               </button>

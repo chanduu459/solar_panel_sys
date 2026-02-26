@@ -26,7 +26,7 @@ function StarRating({ rating }: { rating: number }) {
 // Review Card Component
 function ReviewCard({ review }: { review: Review }) {
   return (
-    <div className="bg-[#1a1a1a] rounded-2xl p-6 border border-white/10 h-full flex flex-col">
+    <div className="bg-[#1a1530] rounded-2xl p-6 border border-white/10 h-full flex flex-col">
       {/* Quote Icon */}
       <Quote className="w-8 h-8 text-[#c4ff00]/30 mb-4" />
 
@@ -97,7 +97,7 @@ export default function ReviewsSection() {
     approvedReviews.reduce((sum, r) => sum + r.rating, 0) / approvedReviews.length;
 
   return (
-    <section className="py-16 sm:py-24 bg-[#0a0a0a]">
+    <section className="py-16 sm:py-24 bg-[#0c0a1a]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-10">
@@ -111,7 +111,7 @@ export default function ReviewsSection() {
           </div>
 
           {/* Rating Summary */}
-          <div className="flex items-center gap-4 bg-[#1a1a1a] rounded-2xl p-4 border border-white/10">
+          <div className="flex items-center gap-4 bg-[#1a1530] rounded-2xl p-4 border border-white/10">
             <div className="text-center">
               <div className="text-3xl font-bold text-[#c4ff00]">
                 {averageRating.toFixed(1)}
