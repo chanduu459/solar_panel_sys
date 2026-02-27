@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Mail, Phone, MapPin, Clock, Send, CheckCircle, Loader2, MessageSquare, User,  } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Mail, Phone, MapPin, Clock, Send, CheckCircle, Loader2, MessageSquare, User, Star, Eye, PenLine, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
@@ -10,7 +10,7 @@ import Footer from '../sections/public/Footer';
 import { toast } from 'sonner';
 
 export default function ContactPage() {
-  const { settings, createInquiry } = useData();
+  const { settings, createInquiry, reviews, fetchReviews, createReview } = useData();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [formData, setFormData] = useState({
@@ -19,6 +19,37 @@ export default function ContactPage() {
     phone: '',
     message: '',
   });
+
+  // Reviews section state
+  const [reviewTab, setReviewTab] = useState<'view' | 'write'>('view');
+  const [isReviewSubmitting, setIsReviewSubmitting] = useState(false);
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [currentReviewPage, setCurrentReviewPage] = useState(0);
+  const reviewsPerPage = 4; // Show 4 reviews per page (2x2 grid)
+  const [reviewData, setReviewData] = useState({
+    reviewer_name: '',
+    rating: 5,
+    comment: '',
+  });
+
+  // Pagination calculations
+  const totalReviewPages = reviews ? Math.ceil(reviews.length / reviewsPerPage) : 0;
+  const paginatedReviews = reviews ? reviews.slice(
+    currentReviewPage * reviewsPerPage,
+    (currentReviewPage + 1) * reviewsPerPage
+  ) : [];
+
+  const nextReviewPage = () => {
+    setCurrentReviewPage((prev) => (prev + 1) % totalReviewPages);
+  };
+
+  const prevReviewPage = () => {
+    setCurrentReviewPage((prev) => (prev - 1 + totalReviewPages) % totalReviewPages);
+  };
+
+  useEffect(() => {
+    fetchReviews(true); // Fetch all reviews including unapproved
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -68,6 +99,40 @@ export default function ContactPage() {
       toast.error('An error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!reviewData.reviewer_name.trim()) {
+      toast.error('Please enter your name');
+      return;
+    }
+    if (!reviewData.comment.trim()) {
+      toast.error('Please enter your review');
+      return;
+    }
+
+    setIsReviewSubmitting(true);
+
+    try {
+      const result = await createReview({
+        reviewer_name: reviewData.reviewer_name,
+        rating: reviewData.rating,
+        comment: reviewData.comment,
+      });
+
+      if (result) {
+        setReviewSubmitted(true);
+        toast.success('Review submitted! It will be visible after approval.');
+      } else {
+        toast.error('Failed to submit review.');
+      }
+    } catch (error) {
+      toast.error('An error occurred. Please try again.');
+    } finally {
+      setIsReviewSubmitting(false);
     }
   };
 
@@ -299,6 +364,256 @@ export default function ContactPage() {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Reviews Section */}
+          <div className="mt-24">
+            <h2 className="text-3xl font-extrabold text-slate-900 text-center mb-6 tracking-tight">
+              Customer <span className="text-orange-500">Reviews</span>
+            </h2>
+            <p className="text-center text-slate-600 font-medium mb-10 max-w-2xl mx-auto">
+              See what our customers say about us or share your experience
+            </p>
+
+            {/* Tab Switcher */}
+            <div className="flex justify-center gap-4 mb-10">
+              <Button
+                onClick={() => setReviewTab('view')}
+                className={`px-8 py-6 rounded-full font-bold flex items-center gap-2 transition-all ${
+                  reviewTab === 'view'
+                    ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-500/20'
+                    : 'bg-white border border-amber-200 text-slate-700 hover:border-orange-300 hover:bg-orange-50'
+                }`}
+              >
+                <Eye className="w-5 h-5" />
+                View Reviews
+              </Button>
+              <Button
+                onClick={() => setReviewTab('write')}
+                className={`px-8 py-6 rounded-full font-bold flex items-center gap-2 transition-all ${
+                  reviewTab === 'write'
+                    ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg shadow-orange-500/20'
+                    : 'bg-white border border-amber-200 text-slate-700 hover:border-orange-300 hover:bg-orange-50'
+                }`}
+              >
+                <PenLine className="w-5 h-5" />
+                Give Your Review
+              </Button>
+            </div>
+
+            {/* View Reviews Tab */}
+            {reviewTab === 'view' && (
+              <div className="max-w-5xl mx-auto">
+                {reviews && reviews.length > 0 ? (
+                  <>
+                    {/* Reviews count and average rating */}
+                    <div className="flex items-center justify-between mb-6">
+                      <p className="text-slate-600 font-medium">
+                        Showing {currentReviewPage * reviewsPerPage + 1}-{Math.min((currentReviewPage + 1) * reviewsPerPage, reviews.length)} of {reviews.length} reviews
+                      </p>
+                      <div className="flex items-center gap-2 bg-white rounded-full px-4 py-2 border border-amber-100">
+                        <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                        <span className="font-bold text-slate-800">
+                          {(reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1)}
+                        </span>
+                        <span className="text-slate-400 text-sm">avg</span>
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {paginatedReviews.map((review) => (
+                        <div
+                          key={review.id}
+                          className="p-8 rounded-[2rem] bg-white border border-amber-100 shadow-sm hover:shadow-lg hover:border-orange-200 transition-all"
+                        >
+                          <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center text-white font-bold text-lg">
+                                {review.reviewer_name.charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <h4 className="font-bold text-slate-800">{review.reviewer_name}</h4>
+                                <p className="text-sm text-slate-400">
+                                  {new Date(review.created_at).toLocaleDateString('en-IN', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`w-5 h-5 ${
+                                    i < review.rating
+                                      ? 'text-amber-400 fill-amber-400'
+                                      : 'text-slate-200'
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-slate-600 font-medium leading-relaxed line-clamp-3">{review.comment}</p>
+                          {review.admin_response && (
+                            <div className="mt-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
+                              <p className="text-sm font-bold text-orange-600 mb-1">Response from Ever Green Solar:</p>
+                              <p className="text-sm text-slate-700 line-clamp-2">{review.admin_response}</p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Pagination Controls */}
+                    {totalReviewPages > 1 && (
+                      <div className="flex items-center justify-center gap-4 mt-8">
+                        <button
+                          onClick={prevReviewPage}
+                          className="p-3 rounded-full bg-white text-slate-500 hover:bg-orange-50 hover:text-orange-600 transition-colors border border-amber-200 shadow-sm"
+                          aria-label="Previous reviews"
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </button>
+                        <div className="flex gap-2">
+                          {Array.from({ length: totalReviewPages }).map((_, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setCurrentReviewPage(i)}
+                              className={`w-3 h-3 rounded-full transition-all ${
+                                i === currentReviewPage 
+                                  ? 'bg-orange-500 scale-125' 
+                                  : 'bg-amber-200 hover:bg-amber-300'
+                              }`}
+                              aria-label={`Go to page ${i + 1}`}
+                            />
+                          ))}
+                        </div>
+                        <button
+                          onClick={nextReviewPage}
+                          className="p-3 rounded-full bg-white text-slate-500 hover:bg-orange-50 hover:text-orange-600 transition-colors border border-amber-200 shadow-sm"
+                          aria-label="Next reviews"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-center py-16 bg-white rounded-[2rem] border border-amber-100">
+                    <Star className="w-16 h-16 text-slate-200 mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-slate-800 mb-2">No Reviews Yet</h3>
+                    <p className="text-slate-500 font-medium">Be the first to share your experience!</p>
+                    <Button
+                      onClick={() => setReviewTab('write')}
+                      className="mt-6 bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 rounded-full px-8 py-6 font-bold"
+                    >
+                      Write a Review
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Write Review Tab */}
+            {reviewTab === 'write' && (
+              <div className="max-w-2xl mx-auto">
+                {reviewSubmitted ? (
+                  <div className="bg-white rounded-[2.5rem] p-12 border border-amber-100 shadow-xl text-center">
+                    <div className="w-24 h-24 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
+                      <CheckCircle className="w-12 h-12 text-emerald-500" />
+                    </div>
+                    <h3 className="text-2xl font-extrabold text-slate-800 mb-4">Thank You!</h3>
+                    <p className="text-slate-500 font-medium mb-8 text-lg leading-relaxed">
+                      Your review has been submitted and is pending approval. It will be visible once our team reviews it.
+                    </p>
+                    <Button
+                      onClick={() => {
+                        setReviewSubmitted(false);
+                        setReviewData({ reviewer_name: '', rating: 5, comment: '' });
+                      }}
+                      className="bg-slate-400 text-white hover:bg-slate-400 rounded-full px-10 py-6 font-bold"
+                    >
+                      Submit Another Review
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-[2.5rem] p-8 sm:p-12 border border-amber-100 shadow-xl">
+                    <h3 className="text-2xl font-extrabold text-blue-800 mb-8">Share Your Experience</h3>
+                    <form onSubmit={handleReviewSubmit} className="space-y-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="reviewer_name" className="text-slate-700 font-bold ml-1 flex items-center gap-2">
+                          <User className="w-4 h-4 text-orange-500" /> Your Name
+                        </Label>
+                        <Input
+                          id="reviewer_name"
+                          type="text"
+                          placeholder="John Doe"
+                          value={reviewData.reviewer_name}
+                          onChange={(e) => setReviewData((prev) => ({ ...prev, reviewer_name: e.target.value }))}
+                          className="bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-orange-400 focus:ring-orange-400/20 shadow-sm rounded-xl py-6 font-medium"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-slate-700 font-bold ml-1 flex items-center gap-2">
+                          <Star className="w-4 h-4 text-orange-500" /> Your Rating
+                        </Label>
+                        <div className="flex gap-2 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={() => setReviewData((prev) => ({ ...prev, rating: star }))}
+                              className="p-1 transition-transform hover:scale-110"
+                            >
+                              <Star
+                                className={`w-10 h-10 ${
+                                  star <= reviewData.rating
+                                    ? 'text-amber-400 fill-amber-400'
+                                    : 'text-slate-300 hover:text-amber-200'
+                                } transition-colors`}
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="comment" className="text-slate-700 font-bold ml-1 flex items-center gap-2">
+                          <MessageSquare className="w-4 h-4 text-orange-500" /> Your Review
+                        </Label>
+                        <Textarea
+                          id="comment"
+                          placeholder="Tell us about your experience with Ever Green Solar Systems..."
+                          value={reviewData.comment}
+                          onChange={(e) => setReviewData((prev) => ({ ...prev, comment: e.target.value }))}
+                          rows={5}
+                          className="bg-slate-50 border-slate-200 text-slate-800 placeholder:text-slate-400 focus:border-orange-400 focus:ring-orange-400/20 shadow-sm rounded-2xl p-6 font-medium resize-none"
+                        />
+                      </div>
+
+                      <Button
+                        type="submit"
+                        disabled={isReviewSubmitting}
+                        className="w-full bg-gradient-to-r from-orange-500 to-amber-500 text-white hover:from-orange-600 hover:to-amber-600 py-8 text-lg font-extrabold rounded-2xl shadow-lg shadow-orange-500/20 border-0 transition-transform hover:-translate-y-0.5 mt-4"
+                      >
+                        {isReviewSubmitting ? (
+                          <>
+                            <Loader2 className="w-6 h-6 mr-2 animate-spin" /> Submitting...
+                          </>
+                        ) : (
+                          <>
+                            <Send className="w-5 h-5 mr-2" /> Submit Review
+                          </>
+                        )}
+                      </Button>
+                    </form>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </main>
