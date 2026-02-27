@@ -80,6 +80,15 @@ CREATE TABLE IF NOT EXISTS settings (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- ============================================
+-- PARTNERS TABLE
+-- ============================================
+CREATE TABLE IF NOT EXISTS partners (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    image_url TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Insert default settings
 INSERT INTO settings (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
 
@@ -104,6 +113,7 @@ ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE inquiries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE partners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
 -- ============================================
@@ -199,6 +209,26 @@ CREATE POLICY "Settings are viewable by everyone"
 CREATE POLICY "Settings can be updated by admins" 
     ON settings FOR UPDATE 
     TO authenticated 
+    USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = TRUE));
+
+-- ============================================
+-- PARTNERS POLICIES
+-- ============================================
+-- Anyone can read partner logos
+CREATE POLICY "Partners are viewable by everyone"
+    ON partners FOR SELECT
+    TO anon, authenticated
+    USING (TRUE);
+
+-- Only admins can insert/delete partners
+CREATE POLICY "Partners can be created by admins"
+    ON partners FOR INSERT
+    TO authenticated
+    WITH CHECK (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = TRUE));
+
+CREATE POLICY "Partners can be deleted by admins"
+    ON partners FOR DELETE
+    TO authenticated
     USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = TRUE));
 
 -- ============================================

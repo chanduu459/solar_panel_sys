@@ -4,6 +4,10 @@ import {  Zap } from 'lucide-react';
 import { useData } from '../../contexts/DataContext';
 // Double check the spelling: indiamap.png (one 'i')
 import indiaMapImg from './indiamap.png';
+import isoImg from './iso.jpeg';
+import iesImg from './iec.jpeg';
+import bisImg from './bis.jpeg';
+import AllmImg from './Allm.jpeg';
 
 export default function MapSection() {
   const { projects, fetchProjects } = useData();
@@ -161,6 +165,43 @@ export default function MapSection() {
             </div>
           </div>
 
+        </div>
+
+        {/* Certifications Strip */}
+        <div className="mt-20 pt-12 border-t border-slate-100">
+          <p className="text-center text-sm font-bold text-slate-500 uppercase tracking-wider mb-8">
+            Certified & Compliant
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12">
+            <div className="h-16 w-24 sm:h-20 sm:w-28 flex items-center justify-center p-2 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+              <img
+                src={iesImg}
+                alt="IEC Certification"
+                className="h-full w-full object-contain"
+              />
+            </div>
+            <div className="h-16 w-24 sm:h-20 sm:w-28 flex items-center justify-center p-2 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+              <img
+                src={isoImg}
+                alt="ISO/IEC Certification"
+                className="h-full w-full object-contain"
+              />
+            </div>
+            <div className="h-16 w-24 sm:h-20 sm:w-28 flex items-center justify-center p-2 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+              <img
+                src={AllmImg}
+                alt="ALMM Certification"
+                className="h-full w-full object-contain"
+              />
+            </div>
+            <div className="h-16 w-24 sm:h-20 sm:w-28 flex items-center justify-center p-2 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
+              <img
+                src={bisImg}
+                alt="Bureau of Indian Standards"
+                className="h-full w-full object-contain"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </section>

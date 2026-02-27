@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   Star,
   Mail,
+  Users,
   Settings,
   LogOut,
   Sun
@@ -32,6 +33,7 @@ import type { Project, ProjectInsert, ProjectUpdate } from '../../types';
 const sidebarLinks = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/projects', label: 'Projects', icon: FolderOpen },
+  { href: '/admin/partners', label: 'Partners', icon: Users },
   { href: '/admin/reviews', label: 'Reviews', icon: Star },
   { href: '/admin/inquiries', label: 'Inquiries', icon: Mail },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
