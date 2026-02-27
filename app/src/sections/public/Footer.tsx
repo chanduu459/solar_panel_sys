@@ -38,7 +38,7 @@ export default function Footer() {
       <div className="border-b border-white/10 bg-gradient-to-r from-[#c4ff00]/10 via-transparent to-[#c4ff00]/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <p className="text-sm text-gray-200">Ready to reduce your energy costs with premium solar infrastructure?</p>
-          <Link to="/contact" className="inline-flex items-center gap-2 text-[#c4ff00] hover:text-[#d4ff33] font-semibold text-sm transition-colors">
+          <Link to="/contact" className="inline-flex items-center gap-2 text-[#055962] hover:text-[#a790ed] font-semibold text-sm transition-colors">
             Talk to our team
             <ArrowUpRight className="w-4 h-4" />
           </Link>
@@ -50,11 +50,17 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <Link to="/" className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#c4ff00] to-[#8bc34a] flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#dac314] to-orange-400 flex items-center justify-center">
                 <Sun className="w-6 h-6 text-black" />
               </div>
               <div>
-                <span className="text-xl font-bold text-white">Solar Systems</span>
+                <span className="text-xl font-bold text-white">
+
+
+
+
+                  Ever Green Solar Systems
+                </span>
                 <span className="block text-xs text-gray-400">India</span>
               </div>
             </Link>

@@ -188,6 +188,23 @@ export interface Database {
           updated_at?: string
         }
       }
+      partners: {
+        Row: {
+          id: string
+          image_url: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          image_url: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          image_url?: string
+          created_at?: string
+        }
+      }
       profiles: {
         Row: {
           id: string
